@@ -4,27 +4,34 @@ library(tidyverse)
 library(here)
 library(bslib)
 library(nefishr)
-library(gt)
-source("helpers.R")
+library(surveydown)
+
+
+
+
+## connect once configured
+db <- sd_db_connect()
 
 ## read in data 
 # data file path 
-data.loc <- here("data")
+# data.loc <- here("data")
+# data.names <- c("rp-weights", "rp-scores", "rp-matrix-tbl")
 
-# 
-csv.names <- c("rp-weights", "rp-scores", "rp-matrix")
-data <- map(csv.names, ~read.csv(here(data.loc, str_c(., "csv", sep = "."))))
-names(data) <- csv.names
+# # 
+# csv.names <- c("rp-weights", "rp-scores", "rp-matrix")
+# data <- map(csv.names, ~read.csv(here(data.loc, str_c(., "csv", sep = "."))))
+data <- sd_get_data(db, "rp-scores")
+# names(data) <- csv.names
 
-year_vals <- unique(data[["rp-scores"]]$report_year) |> sort()
+year_vals <- unique(data$report_year) |> sort()
 stock_vals <- unique(nefishr::nefmc_species$FMP_NAME) |> sort()
 fmp_vals <- unique(nefishr::nefmc_species$FMP) |> sort()
 
-link_shiny <- tags$a(
-  shiny::icon("github"), "Shiny",
-  href = "https://github.com/MarisCollaborative",
-  target = "_blank"
-)
+# link_shiny <- tags$a(
+#   shiny::icon("github"), "Shiny",
+#   href = "https://github.com/MarisCollaborative",
+#   target = "_blank"
+# )
 # link_nefmc <- tags$a(
 #   shiny::icon("r-project"), "Posit",
 #   href = "https://posit.co",
@@ -58,6 +65,7 @@ ui <- fluidPage(
               # Page 1 - shows the matrix table based on the sidebar inputs
               nav_panel(title = "Matrix", 
                         gt_output("matrix")
+                        # tableOutput("matrix")
                         ), 
               # Page 2: shows the recommended probability information of the selected stock and contains
               nav_panel(title = "Recommended Probability",
@@ -89,49 +97,53 @@ ui <- fluidPage(
 
 
 
-server <- function(input, output, session) {
-# create reactive element for selected year 
-year <- reactive(input$year)
+# server <- function(input, output, session) {
+# # create reactive element for selected year 
+# year <- reactive(input$year)
   
-# create reative element for selected FMP 
-fmp <- reactive(input$fmp)
+# # create reative element for selected FMP 
+# fmp <- reactive(input$fmp)
 
-observeEvent(input$fmp, {
-  # Filter choices for the stocks based on the fmp
-  choices_to_show <- nefishr::nefmc_species |>
-    dplyr::filter(FMP == input$fmp) |>
-    dplyr::pull(FMP_NAME) |>
-    unique() |> 
-    sort()
+# observeEvent(input$fmp, {
+#   # Filter choices for the stocks based on the fmp
+#   choices_to_show <- nefishr::nefmc_species |>
+#     dplyr::filter(FMP == input$fmp) |>
+#     dplyr::pull(FMP_NAME) |>
+#     unique() |> 
+#     sort()
 
-  updateSelectInput(session, "stock", choices = choices_to_show)
-})
+#   updateSelectInput(session, "stock", choices = choices_to_show)
+# })
 
-# create reactive element for selected stock
-stock <- reactive(input$stock)
+# # create reactive element for selected stock
+# stock <- reactive(input$stock)
 
 
-matrix_data <- data[["rp-matrix"]]
+# # matrix_data <- data[["rp-matrix"]]
+# info <- sd_get_data(db,
+#                       table = "rp-matrix-tbl",
+#                       refresh_interval = 30) 
 
-output$matrix <- render_gt(
-  {
-    clean_matrix(matrix_data) |> 
-      filter(report_year == year() & stock == str_to_lower(stock())) |>
-      select(!c(report_year, stock)) |> 
-      mutate(value = str_to_title(str_replace_all(value, "_", " ")), 
-             answer = str_to_sentence(str_replace_all(answer, "_", " "))) |>
-      gt(rowname_col = "value", 
-         groupname_col = "factor", 
-         row_group_as_column = TRUE) |>
-      tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) |> 
-      text_case_match(
-        NA ~ "Not provided",
-        .locations = cells_body(answer)
-      ) 
+# output$matrix <- renderTable(
+#   {
+#     info() #|> 
+#       # clean_matrix() #|> 
+#       # filter(report_year == year() & stock == stock()) |>
+#       # select(!c(report_year, stock)) #|> 
+#       # mutate(value = str_to_title(str_replace_all(value, "_", " ")), 
+#       #        answer = str_to_sentence(str_replace_all(answer, "_", " "))) #|>
+#       # gt(rowname_col = "value", 
+#       #    groupname_col = "factor", 
+#       #    row_group_as_column = TRUE) |>
+#       # tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) #|> 
+#       # # text_case_match(
+#       #   NA ~ "Not provided",
+#       #   .locations = cells_body(answer)
+#       # ) 
 
       
-  }
-  )
-}
+#   }
+#   )
+# }
 
-  shinyApp(ui, server)
+  # shinyApp(ui, server)

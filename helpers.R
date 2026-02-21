@@ -1,11 +1,13 @@
 # Helper functions ####
-library
+library(tidyverse)
+library(here)
+library(nefishr)
 
 ## Generate matrix #####
 clean_matrix <- function(data){
 
   matrix <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address")) |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "fish_condition")) |> 
     tidyr::drop_na(report_year) |> 
     dplyr::mutate(across(3:dplyr::last_col(), ~as.character(.))) |>
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
@@ -14,7 +16,10 @@ clean_matrix <- function(data){
     mutate(factor = case_when(
             value %in% c("overfished", "overfishing", "rebuilding_plan", "rebuilding_target", "ssb", "relative_ssb") ~ "Biomass",
             value %in% c("recruit_incl", "recruitment_model", "beg_recruit_yr", "other_recruit_info", "recruit_year_est_1", "recruit_year_est_2", "recruit_year_est_3", "recruit_est_1", "recruit_est_2", "recruit_est_3") ~ "Recruitment",
-            value %in% c("climate_vulnerability", "climate_direction") ~ "Climate Vulnerability",
+            value %in% c("climate_vulnerability", "climate_direction", "no_of_prey", "prey_information") ~ "Climate Vulnerability",
+            value %in% c("assessment_type", "assessment_model", "retro_pattern", "retro_val", "data_used", "missing_data", "uncertainty_sources", "terminal_assessment_year") ~ "Assessment and Uncertainty",
+            value %in% c("other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
+            value %in% c("OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
             TRUE ~ value
           )) |>#, 
           # theme = case_when(
