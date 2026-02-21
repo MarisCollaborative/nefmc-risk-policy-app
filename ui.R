@@ -80,7 +80,10 @@ ui <- fluidPage(
                         sliderInput('changeRecreational', "Recreational Fishery", min = -1, max = 1, value = 0, step = 1)
                                           ),
                         # shows the table of data with PDT scores and Council weightings
-                        nav_panel("Z-score Data", gt_output("scores")), 
+                        nav_panel("Z-score Data", 
+                                  tableOutput("scores"), 
+                                  verbatimTextOutput('zscore', placeholder = T), 
+                                  verbatimTextOutput('RecProb', placeholder = T)), 
                         # plots the calculated Z-score based on the scores and weights
                         nav_panel("Z-score Plot", plotOutput("zplot")),
                                         ),

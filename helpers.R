@@ -38,14 +38,63 @@ clean_matrix <- function(data){
 }
 
 
-# get_matrix_data <- function(data, cols, filter_by){
-#   data <- clean_matrix(data) |> 
-#   filter({{ cols }} %in% {{ filter_by }}) |> 
-#     rename("Supporting Information" = answer, 
-#            "Value" = value)
-#   return(data)
-# }
+clean_scores <- function(data){
 
+  scores <- data |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "assessment")) |>  
+    tidyr::pivot_longer(cols = 3:dplyr::last_col(),
+                        names_to = "factor", 
+                        values_to = "score")
+  
+}
+
+clean_weights <- function(data){
+
+  weights <- data |> 
+    relocate(report_year, .before = everything()) |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "weight_year", "weightings")) |>  
+    tidyr::pivot_longer(cols = 2:dplyr::last_col(),
+                        names_to = "factor", 
+                        values_to = "weight") |> 
+    mutate(weight = as.integer(weight), 
+           factor = str_extract(factor, pattern = "(?<=[:punct:])[:alpha:]+")) |> # extract words/letters that are preceded by a punctuation
+    tidyr::drop_na(weight) |>
+    # group_by(report_year, factor) |> 
+    summarise(avg_weight = mean(weight, na.rm = T), .by = c(report_year, factor))
+
+}
+
+## Z-Score Calculation ####
+calc_zscore <- function(score, weight){
+  # data <- data |> 
+  #   mutate(product = scaled_score*normalized_weight) 
+  # x <- sum(data$product)
+  sum({{score}}*{{weight}})
+}
+
+calc_recprob <- function(z){
+    1/(1+exp(-z))
+}
+
+## Plot Z-Score ####
+plot_zscore <- function(data, xcol, ycol, ...){
+    ggplot() + 
+        lims(x = c(-2,4), y = c(0,1))+
+        geom_function(fun = calc_recprob, linewidth = 1) + 
+        geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
+        geom_point(data = data, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
+        scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Recommended\nProbability" = "#3e9eb6")) +
+        # annotate(geom = 'shadowtext', x = {{x}}, y = {{y}}, label = input$dataset, color = 'blue', size = 6, bg.colour = 'white', vjust = -0.75)+
+        # annotate(geom = 'text', x = 3, y = 0.5, label = 'MSA 50%\nprobability limit', color = 'red', size = 4, vjust = -0.4)+
+        labs(x = 'Z-Score', y = 'Recommended Probability') +
+        theme_bw() +
+        theme(axis.title = element_text(size = rel(1.25)),
+              axis.text = element_text(size = rel(1.25)), 
+              legend.position = "bottom", 
+              legend.title = element_text(size = rel(1.25)),
+              legend.text = element_text(size = rel(1.25)), 
+              legend.key.spacing = unit(0.5, "cm"))
+}
 
 ## Render Report function #####
 ## create a temporary file location
