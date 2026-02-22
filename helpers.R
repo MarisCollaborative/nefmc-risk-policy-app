@@ -44,7 +44,9 @@ clean_scores <- function(data){
     dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "assessment")) |>  
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "factor", 
-                        values_to = "score")
+                        values_to = "score") |> 
+    mutate(score = as.integer(score),
+           scaled_score = score/4)
   
 }
 
@@ -60,8 +62,10 @@ clean_weights <- function(data){
            factor = str_extract(factor, pattern = "(?<=[:punct:])[:alpha:]+")) |> # extract words/letters that are preceded by a punctuation
     tidyr::drop_na(weight) |>
     # group_by(report_year, factor) |> 
-    summarise(avg_weight = mean(weight, na.rm = T), .by = c(report_year, factor))
+    summarise(avg_weight = round(mean(weight, na.rm = T),2), .by = c(report_year, factor)) |>
+    mutate(normalized_weight = round(avg_weight / sum(avg_weight), 2)) 
 
+  return(weights)
 }
 
 ## Z-Score Calculation ####
