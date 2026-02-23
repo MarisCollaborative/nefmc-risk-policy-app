@@ -3,7 +3,59 @@ library(tidyverse)
 library(here)
 library(nefishr)
 
-## Generate matrix #####
+## General helpers #### ===============================================================
+### Scale a value ####
+#' 
+#' 
+#' 
+scale_val <- function(x, y){ x/y }
+
+
+### Normalize a value ####
+#' 
+#' 
+#' 
+#' 
+normalize_val <- function(x){ x / sum(x) }
+
+
+### Calculate a Z-score ####
+#' 
+#' 
+#' 
+calc_zscore <- function(score, weight){ sum({{score}}*{{weight}}) }
+
+### Calculate the recommended probability ####
+#' 
+#' 
+#' 
+calc_recprob <- function(z){ 1/(1+exp(-z)) }
+
+### Render Report function #####
+#'
+#' 
+#' 
+## create a temporary file location
+report_path <- tempfile(fileext = ".Rmd")
+
+## copy the RMD file in the repo to the temporary file location and overwrite if already existing
+file.copy("draft_report.Rmd", report_path, overwrite = TRUE)
+
+## create render report function 
+render_report <- function(input, output, params) {
+  # render the report by rendering the RMD file
+  rmarkdown::render(input,
+    output_file = output,
+    params = params,
+    envir = new.env(parent = globalenv())
+  )
+} 
+
+## Specific helpers #### ==============================================================
+### Clean matrix ####
+#' 
+#' 
+#' 
 clean_matrix <- function(data){
 
   matrix <- data |> 
@@ -21,23 +73,17 @@ clean_matrix <- function(data){
             value %in% c("other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
             value %in% c("OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
             TRUE ~ value
-          )) |>#, 
-          # theme = case_when(
-          #   factor %in% c("Biomass", "Recruitment") ~ "Stock Status and Uncertainty",
-          #   factor == "Climate Vulnerability" ~ "Climate and Ecosystem",
-          #   TRUE ~ "Additional Information",
-          # )) |> 
+          )) |>
     tidyr::drop_na(factor) 
 
   return(matrix)
-  # res <- data |> 
-  #   gt::gt(rowname_col = "factor") |> 
-  #   tab_stubhead(label = "Factor") |> 
-  #   cols_label(answer = "Supporting Information") |> 
-  #   cols_hide(c("report_year", "stock"))
+
 }
 
-
+### Clean risk policy scores data ####
+#' 
+#' 
+#' 
 clean_scores <- function(data){
 
   scores <- data |> 
@@ -46,41 +92,41 @@ clean_scores <- function(data){
                         names_to = "factor", 
                         values_to = "score") |> 
     mutate(score = as.integer(score),
-           scaled_score = score/4)
+           scaled_score = scale_val(score))
+  
+  return(scores)
   
 }
 
+### Clean risk policy weights data ####
+#' 
+#' 
+#'
 clean_weights <- function(data){
 
   weights <- data |> 
-    relocate(report_year, .before = everything()) |> 
+    dplyr::relocate(report_year, .before = dplyr::everything()) |> 
     dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "weight_year", "weightings")) |>  
     tidyr::pivot_longer(cols = 2:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "weight") |> 
-    mutate(weight = as.integer(weight), 
+    dplyr::mutate(weight = as.integer(weight), 
            factor = str_extract(factor, pattern = "(?<=[:punct:])[:alpha:]+")) |> # extract words/letters that are preceded by a punctuation
     tidyr::drop_na(weight) |>
-    # group_by(report_year, factor) |> 
-    summarise(avg_weight = round(mean(weight, na.rm = T),2), .by = c(report_year, factor)) |>
-    mutate(normalized_weight = round(avg_weight / sum(avg_weight), 2)) 
+    dplyr::summarise(avg_weight = round(
+                                        mean(weight, na.rm = T), 
+                                        2),
+                    .by = c(report_year, factor)) |>
+    dplyr::mutate(normalized_weight = round(normalize_val(avg_weight), 2)) 
 
   return(weights)
 }
 
-## Z-Score Calculation ####
-calc_zscore <- function(score, weight){
-  # data <- data |> 
-  #   mutate(product = scaled_score*normalized_weight) 
-  # x <- sum(data$product)
-  sum({{score}}*{{weight}})
-}
-
-calc_recprob <- function(z){
-    1/(1+exp(-z))
-}
-
-## Plot Z-Score ####
+### Plot Z-Score ####
+#'
+#' 
+#' 
+#' 
 plot_zscore <- function(data, xcol, ycol, ...){
     ggplot() + 
         lims(x = c(-2,4), y = c(0,1))+
@@ -99,20 +145,3 @@ plot_zscore <- function(data, xcol, ycol, ...){
               legend.text = element_text(size = rel(1.25)), 
               legend.key.spacing = unit(0.5, "cm"))
 }
-
-## Render Report function #####
-## create a temporary file location
-report_path <- tempfile(fileext = ".Rmd")
-
-## copy the RMD file in the repo to the temporary file location and overwrite if already existing
-file.copy("draft_report.Rmd", report_path, overwrite = TRUE)
-
-## create render report function 
-render_report <- function(input, output, params) {
-  # render the report by rendering the RMD file
-  rmarkdown::render(input,
-    output_file = output,
-    params = params,
-    envir = new.env(parent = globalenv())
-  )
-} 
