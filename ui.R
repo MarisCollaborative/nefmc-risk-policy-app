@@ -4,7 +4,10 @@ library(tidyverse)
 library(here)
 library(bslib)
 library(nefishr)
+library(DT)
+library(gt)
 library(surveydown)
+library(shinyjs)
 
 
 
@@ -24,7 +27,7 @@ data <- sd_get_data(db, "rp-scores")
 # names(data) <- csv.names
 
 year_vals <- unique(data$report_year) |> sort()
-stock_vals <- unique(nefishr::nefmc_species$FMP_NAME) |> sort()
+stock_vals <- unique(nefishr::nefmc_species$STOCK_NAME) |> sort()
 fmp_vals <- unique(nefishr::nefmc_species$FMP) |> sort()
 
 # link_shiny <- tags$a(
@@ -40,6 +43,7 @@ fmp_vals <- unique(nefishr::nefmc_species$FMP) |> sort()
 
 
 ui <- fluidPage(
+  shinyjs::useShinyjs(),
   # create a multi-page application 
   page_navbar(title = 'NEFMC Risk Policy Application', # with the following title
               sidebar = sidebar( # and a shared sidebar across pages, that has the following
@@ -51,13 +55,20 @@ ui <- fluidPage(
                 ## Year selection 
                 selectInput(inputId = "year", 
                       label = "Action Year", 
-                      choices = year_vals),
+                      choices = c("Select a year...", year_vals), 
+                      selected = "Select a year..."),
 
                 ## FMP selection
-                selectInput('fmp', label = 'Select FMP', choices = fmp_vals),
+                selectInput(inputId = 'fmp', 
+                      label = 'Select FMP', 
+                      choices = c("Select an FMP...", fmp_vals), 
+                      selected = "Select an FMP..."),
                 
                 ## Stock selection
-                selectInput('stock', label = 'Select stock', choices = stock_vals),
+                selectInput(inputId = 'stock', 
+                            label = 'Select stock', 
+                            choices = c("Select a stock...", stock_vals), 
+                            selected = "Select a stock..."),
                 
                 # Generate Report button
                 downloadButton("report", "Generate report")
@@ -77,13 +88,19 @@ ui <- fluidPage(
                         sliderInput('changeRecruitment', "Recruitment", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeClimate', "Climate Vulnerability", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeCommercial', "Commercial Fishery", min = -1, max = 1, value = 0, step = 1),
-                        sliderInput('changeRecreational', "Recreational Fishery", min = -1, max = 1, value = 0, step = 1)
+                        sliderInput('changeRecreational', "Recreational Fishery", min = -1, max = 1, value = 0, step = 1), 
+                        actionButton('changeScores', "Make Changes"), 
+                        actionButton('resetScores', "Reset Scores")
                                           ),
                         # shows the table of data with PDT scores and Council weightings
                         nav_panel("Z-score Data", 
-                                  tableOutput("scores"), 
+                                  gt_output("scores"), 
+                                  # DTOutput("scores"),
                                   verbatimTextOutput('zscore', placeholder = T), 
                                   verbatimTextOutput('RecProb', placeholder = T)), 
+                        # display to show functionality of slider. 
+                        nav_panel("Slider Change Test", tableOutput("changes"),
+                                        ),
                         # plots the calculated Z-score based on the scores and weights
                         nav_panel("Z-score Plot", plotOutput("zplot")),
                                         ),

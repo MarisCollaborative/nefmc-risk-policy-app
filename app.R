@@ -3,6 +3,7 @@ library(shiny)
 library(tidyverse)
 library(here)
 library(surveydown)
+library(gt)
 
 # Load in the functions, ui, and server into the environment
 source(here("helpers.R"))
