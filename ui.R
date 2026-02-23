@@ -1,52 +1,36 @@
-# UI ####
+# User Interface for Risk Policy Shiny App ####
+## Environment set-up
 library(shiny)
 library(tidyverse)
 library(here)
 library(bslib)
 library(nefishr)
-library(DT)
 library(gt)
 library(surveydown)
 library(shinyjs)
 
-
-
-
-## connect once configured
+# connect to survey database
 db <- sd_db_connect()
 
-## read in data 
-# data file path 
-# data.loc <- here("data")
-# data.names <- c("rp-weights", "rp-scores", "rp-matrix-tbl")
-
-# # 
-# csv.names <- c("rp-weights", "rp-scores", "rp-matrix")
-# data <- map(csv.names, ~read.csv(here(data.loc, str_c(., "csv", sep = "."))))
+# fetch the risk policy scores from the database 
 data <- sd_get_data(db, "rp-scores")
-# names(data) <- csv.names
 
+# identify the unique values of report year that occur in the table
 year_vals <- unique(data$report_year) |> sort()
+
+# identify the unique values of Stock Name from the nefmc_species dataframe in the nefishr package
 stock_vals <- unique(nefishr::nefmc_species$STOCK_NAME) |> sort()
+
+# identify the unique values of FMP from the nefmc_species dataframe in the nefishr package
 fmp_vals <- unique(nefishr::nefmc_species$FMP) |> sort()
 
-# link_shiny <- tags$a(
-#   shiny::icon("github"), "Shiny",
-#   href = "https://github.com/MarisCollaborative",
-#   target = "_blank"
-# )
-# link_nefmc <- tags$a(
-#   shiny::icon("r-project"), "Posit",
-#   href = "https://posit.co",
-#   target = "_blank"
-# )
-
-
+# User Interface ####
 ui <- fluidPage(
   shinyjs::useShinyjs(),
   # create a multi-page application 
   page_navbar(title = 'NEFMC Risk Policy Application', # with the following title
-              sidebar = sidebar( # and a shared sidebar across pages, that has the following
+              # a shared sidebar across pages, that has the following
+              sidebar = sidebar( 
                 # Settings  
                 id = "sidebar", 
                 width = 350, 
@@ -55,20 +39,20 @@ ui <- fluidPage(
                 ## Year selection 
                 selectInput(inputId = "year", 
                       label = "Action Year", 
-                      choices = c("Select a year...", year_vals), 
-                      selected = "Select a year..."),
+                      choices = c("Select a year...", year_vals), # using the unique year values from the scoring table
+                      selected = "Select a year..."), # the initial value shown when the user starts the app 
 
                 ## FMP selection
                 selectInput(inputId = 'fmp', 
                       label = 'Select FMP', 
-                      choices = c("Select an FMP...", fmp_vals), 
-                      selected = "Select an FMP..."),
+                      choices = c("Select an FMP...", fmp_vals), # using the unique fmp values from the nefmc_species table
+                      selected = "Select an FMP..."), # the initial value shown when the user starts the app 
                 
                 ## Stock selection
                 selectInput(inputId = 'stock', 
                             label = 'Select stock', 
-                            choices = c("Select a stock...", stock_vals), 
-                            selected = "Select a stock..."),
+                            choices = c("Select a stock...", stock_vals), # using the unique stock values from the nefmc_species table
+                            selected = "Select a stock..."), # the initial value shown when the user starts the app
                 
                 # Generate Report button
                 downloadButton("report", "Generate report")
@@ -76,94 +60,34 @@ ui <- fluidPage(
               # Page 1 - shows the matrix table based on the sidebar inputs
               nav_panel(title = "Matrix", 
                         gt_output("matrix")
-                        # tableOutput("matrix")
                         ), 
-              # Page 2: shows the recommended probability information of the selected stock and contains
+              # Page 2 - shows the recommended probability information based on user inputs and contains
               nav_panel(title = "Recommended Probability",
-                    # a multi-tab card that  
+                    # a multi-tab card with  
                     navset_card_tab( 
-                        # contains a shared sidebar to change the factors by one level 
+                        # a shared sidebar to change the factors by one level 
                         sidebar = sidebar(id = "changeFactors",
                         sliderInput('changeBiomass', "Biomass", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeRecruitment', "Recruitment", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeClimate', "Climate Vulnerability", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeCommercial', "Commercial Fishery", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeRecreational', "Recreational Fishery", min = -1, max = 1, value = 0, step = 1), 
+                        # action buttons to manipulate the scores based on user input or restore the scores to their original values
                         actionButton('changeScores', "Make Changes"), 
                         actionButton('resetScores', "Reset Scores")
                                           ),
-                        # shows the table of data with PDT scores and Council weightings
+                        # a table of data with PDT scores and Council weightings, and text containing the calculated z-score and recommended probabilities
                         nav_panel("Z-score Data", 
-                                  gt_output("scores"), 
-                                  # DTOutput("scores"),
+                                  gt_output("scores"),
                                   verbatimTextOutput('zscore', placeholder = T), 
                                   verbatimTextOutput('RecProb', placeholder = T)), 
-                        # display to show functionality of slider. 
-                        nav_panel("Slider Change Test", tableOutput("changes"),
-                                        ),
-                        # plots the calculated Z-score based on the scores and weights
+                        # a plot of the calculated Z-score and recommended probability based on the scores and weights
                         nav_panel("Z-score Plot", plotOutput("zplot")),
                                         ),
-                  # an text area, if there is a decision to change a score(s) and ultimately the recommended probability 
+                  # and a text area for user input if there is a decision to change a score(s) and ultimately the recommended probability for a given stock in a given year
                   card(textAreaInput("text", "If you are recommending a change to a score, enter your rationale below.", width = '100%')
                       )
                 
             )
           )
         )
-
-
-
-
-
-
-# server <- function(input, output, session) {
-# # create reactive element for selected year 
-# year <- reactive(input$year)
-  
-# # create reative element for selected FMP 
-# fmp <- reactive(input$fmp)
-
-# observeEvent(input$fmp, {
-#   # Filter choices for the stocks based on the fmp
-#   choices_to_show <- nefishr::nefmc_species |>
-#     dplyr::filter(FMP == input$fmp) |>
-#     dplyr::pull(FMP_NAME) |>
-#     unique() |> 
-#     sort()
-
-#   updateSelectInput(session, "stock", choices = choices_to_show)
-# })
-
-# # create reactive element for selected stock
-# stock <- reactive(input$stock)
-
-
-# # matrix_data <- data[["rp-matrix"]]
-# info <- sd_get_data(db,
-#                       table = "rp-matrix-tbl",
-#                       refresh_interval = 30) 
-
-# output$matrix <- renderTable(
-#   {
-#     info() #|> 
-#       # clean_matrix() #|> 
-#       # filter(report_year == year() & stock == stock()) |>
-#       # select(!c(report_year, stock)) #|> 
-#       # mutate(value = str_to_title(str_replace_all(value, "_", " ")), 
-#       #        answer = str_to_sentence(str_replace_all(answer, "_", " "))) #|>
-#       # gt(rowname_col = "value", 
-#       #    groupname_col = "factor", 
-#       #    row_group_as_column = TRUE) |>
-#       # tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) #|> 
-#       # # text_case_match(
-#       #   NA ~ "Not provided",
-#       #   .locations = cells_body(answer)
-#       # ) 
-
-      
-#   }
-#   )
-# }
-
-  # shinyApp(ui, server)
