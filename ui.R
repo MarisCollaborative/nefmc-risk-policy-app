@@ -85,7 +85,10 @@ ui <- fluidPage(
                         nav_panel("Z-score Plot", plotOutput("zplot")),
                                         ),
                   # and a text area for user input if there is a decision to change a score(s) and ultimately the recommended probability for a given stock in a given year
-                  card(textAreaInput("text", "If you are recommending a change to a score, enter your rationale below.", width = '100%')
+                  card(textAreaInput(inputId = "rationale", 
+                                     label = "If you are recommending a change to a score, enter your rationale below.", 
+                                     width = '100%')#, 
+                                     #value = "No changes or additional rationale provided.")
                       )
                 
             )

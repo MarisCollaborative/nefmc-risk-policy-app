@@ -8,7 +8,7 @@ library(nefishr)
 #' 
 #' 
 #' 
-scale_val <- function(x, y){ x/y }
+scale_val <- function(x, y = 4){ x / {{y}} }
 
 
 ### Normalize a value ####
@@ -35,12 +35,6 @@ calc_recprob <- function(z){ 1/(1+exp(-z)) }
 #'
 #' 
 #' 
-## create a temporary file location
-report_path <- tempfile(fileext = ".Rmd")
-
-## copy the RMD file in the repo to the temporary file location and overwrite if already existing
-file.copy("draft_report.Rmd", report_path, overwrite = TRUE)
-
 ## create render report function 
 render_report <- function(input, output, params) {
   # render the report by rendering the RMD file
@@ -49,7 +43,8 @@ render_report <- function(input, output, params) {
     params = params,
     envir = new.env(parent = globalenv())
   )
-} 
+}
+
 
 ## Specific helpers #### ==============================================================
 ### Clean matrix ####
@@ -59,13 +54,15 @@ render_report <- function(input, output, params) {
 clean_matrix <- function(data){
 
   matrix <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "fish_condition")) |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page")) |> 
     tidyr::drop_na(report_year) |> 
     dplyr::mutate(across(3:dplyr::last_col(), ~as.character(.))) |>
+    dplyr::relocate("terminal_assessment_year", .after = "assessment_model") |>  
+    dplyr::relocate("signif_catch_present", .before = "signif_catch_information") |> 
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "value", 
                         values_to = "answer") |> 
-    mutate(factor = case_when(
+    dplyr::mutate(factor = case_when(
             value %in% c("overfished", "overfishing", "rebuilding_plan", "rebuilding_target", "ssb", "relative_ssb") ~ "Biomass",
             value %in% c("recruit_incl", "recruitment_model", "beg_recruit_yr", "other_recruit_info", "recruit_year_est_1", "recruit_year_est_2", "recruit_year_est_3", "recruit_est_1", "recruit_est_2", "recruit_est_3") ~ "Recruitment",
             value %in% c("climate_vulnerability", "climate_direction", "no_of_prey", "prey_information") ~ "Climate Vulnerability",
@@ -74,7 +71,21 @@ clean_matrix <- function(data){
             value %in% c("OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
             TRUE ~ value
           )) |>
-    tidyr::drop_na(factor) 
+    dplyr::relocate("factor", .after = "stock") |> 
+    tidyr::drop_na(factor) |> 
+    # replace any underscores in the value and answer columns with spaces
+    dplyr::mutate(value = dplyr::case_when(
+                        value == "ssb" ~ "SSB",
+                        value == "relative_ssb" ~ "Relative SSB",
+                        value == "recruit_incl" ~ " Recruitment is estimated", 
+                        value == "beg_recruit_yr" ~ "Initial year of time series",
+                        value == "retro_pattern" ~ "Retrospective Pattern", 
+                        value == "retro_val" ~ "Retrospective Values",
+                        value == "signif_catch_present" ~ "Significant Catch Present", 
+                        value == "signif_catch_information" ~ "Significant Catch Information",
+                        value %in% stringr::str_subset(value, "[:lower:]") ~ stringr::str_to_title(stringr::str_replace_all(value, "_", " ")),
+                        TRUE ~ str_replace_all(value, "_", " ")),
+                  answer = str_replace_all(answer, "_", " "))
 
   return(matrix)
 
