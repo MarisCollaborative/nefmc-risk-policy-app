@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "locale": "en_US",
+  "platform": "4.5.2",
+  "metadata": {
+    "appmode": "shiny",
+    "primary_rmd": null,
+    "primary_html": null,
+    "content_category": null,
+    "has_parameters": false
+  },
+  "environment": {
+    "r": {
+      "requires": "~=4.5.0"
+    }
+  },
+  "packages": {
+    "renv": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "renv",
+        "Type": "Package",
+        "Title": "Project Environments",
+        "Version": "1.1.7",
+        "Authors@R": "c(\n    person(\"Kevin\", \"Ushey\", role = c(\"aut\", \"cre\"), email = \"kevin@rstudio.com\",\n           comment = c(ORCID = \"0000-0003-2880-7407\")),\n    person(\"Hadley\", \"Wickham\", role = c(\"aut\"), email = \"hadley@rstudio.com\",\n           comment = c(ORCID = \"0000-0003-4757-117X\")),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"))\n    )",
+        "Description": "A dependency management toolkit for R. Using 'renv', you can create\n    and manage project-local R libraries, save the state of these libraries to\n    a 'lockfile', and later restore your library as required. Together, these\n    tools can help make your projects more isolated, portable, and reproducible.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://rstudio.github.io/renv/, https://github.com/rstudio/renv",
+        "BugReports": "https://github.com/rstudio/renv/issues",
+        "Imports": "utils",
+        "Suggests": "BiocManager, cli, compiler, covr, cpp11, curl, devtools,\ngenerics, gitcreds, jsonlite, jsonvalidate, knitr, miniUI,\nmodules, packrat, pak, R6, remotes, reticulate, rmarkdown,\nrstudioapi, shiny, testthat, uuid, waldo, yaml, webfakes",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.3.3",
+        "VignetteBuilder": "knitr",
+        "Config/Needs/website": "tidyverse/tidytemplate",
+        "Config/testthat/edition": "3",
+        "Config/testthat/parallel": "true",
+        "Config/testthat/start-first": "bioconductor,python,install,restore,snapshot,retrieve,remotes",
+        "NeedsCompilation": "no",
+        "Packaged": "2026-01-26 18:33:40 UTC; kevin",
+        "Author": "Kevin Ushey [aut, cre] (ORCID: <https://orcid.org/0000-0003-2880-7407>),\n  Hadley Wickham [aut] (ORCID: <https://orcid.org/0000-0003-4757-117X>),\n  Posit Software, PBC [cph, fnd]",
+        "Maintainer": "Kevin Ushey <kevin@rstudio.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2026-01-27 11:50:02 UTC",
+        "Built": "R 4.5.2; ; 2026-02-15 02:02:04 UTC; windows"
+      }
+    }
+  },
+  "files": {
+    ".env": {
+      "checksum": "eae835a316eb46eec45a56839a1be351"
+    },
+    ".Rprofile": {
+      "checksum": "a644ea97fcdb8ba0b9b6bd1f14b33968"
+    },
+    "app.R": {
+      "checksum": "ca5559722df40652de951c994d15f487"
+    },
+    "data/rp-matrix.csv": {
+      "checksum": "f02634a40e0cc6d5f9ba72711345cee3"
+    },
+    "data/rp-scores.csv": {
+      "checksum": "89782e11a1bd35db8fd6c7f09b41937b"
+    },
+    "data/rp-weights.csv": {
+      "checksum": "ad9f1f40822fd754c2c340691b288624"
+    },
+    "draft_report.qmd": {
+      "checksum": "c69211394ce8ff291c738862e3269567"
+    },
+    "helpers.R": {
+      "checksum": "b4007f17527ff71ba7338b3a9b614e2b"
+    },
+    "modules.R": {
+      "checksum": "57b3bd3387e7e355c0c1ca72e643a9ea"
+    },
+    "README.md": {
+      "checksum": "73f1c6b3bb448ed30c1d8d06b6fc8226"
+    },
+    "renv.lock": {
+      "checksum": "4e2ee105a8c02b68d2723787ebbb9a37"
+    },
+    "rp_report.qmd": {
+      "checksum": "0156ffa5e79dd4688c6d698f0c4e75bf"
+    },
+    "server.R": {
+      "checksum": "6cf26425cc773b645be985cf84f4312c"
+    },
+    "shiny_quarto.html": {
+      "checksum": "160d561995fcb59c000703509a87e1df"
+    },
+    "shiny_quarto.qmd": {
+      "checksum": "ce1f04d215d7e644c9e79d0cc8668561"
+    },
+    "shiny_quarto_data/data_chunks_index.txt": {
+      "checksum": "e9a7b18a42db655a265232f05ac57d0e"
+    },
+    "shiny_quarto_data/unnamed-chunk-2.RData": {
+      "checksum": "b817776ddaee0aa8029b4c80c5400af7"
+    },
+    "shiny_quarto_files/libs/bootstrap/bootstrap-890b18279d630a8af0357820e6fbb7bc.min.css": {
+      "checksum": "890b18279d630a8af0357820e6fbb7bc"
+    },
+    "shiny_quarto_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css": {
+      "checksum": "9e3ffae467580fdb927a41352e75a2e0"
+    },
+    "shiny_quarto_files/libs/bootstrap/bootstrap-dark-890b18279d630a8af0357820e6fbb7bc.min.css": {
+      "checksum": "890b18279d630a8af0357820e6fbb7bc"
+    },
+    "shiny_quarto_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "886da841d7421705f715f600c5ff11bb"
+    },
+    "shiny_quarto_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
+    },
+    "shiny_quarto_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
+    },
+    "shiny_quarto_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/components.js": {
+      "checksum": "ac49ebff39666f27f4631a3914841683"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/datatables.min.css": {
+      "checksum": "7b2279175549cd49b758a7d5b4da6cd6"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/datatables.min.js": {
+      "checksum": "c06be800b0cfc85e5d5b522e200c5f51"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/pdfmake.min.js": {
+      "checksum": "95caca411bcbd3095c0f8db152de05dd"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/quarto-dashboard.js": {
+      "checksum": "73bfea128e6f7c27f0bab4cc0777aff9"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/stickythead.js": {
+      "checksum": "5b27aeec9a60192899f23015fd741564"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/vfs_fonts.js": {
+      "checksum": "8a026906153f3e29bc684f6b392e8654"
+    },
+    "shiny_quarto_files/libs/quarto-dashboard/web-components.js": {
+      "checksum": "c91de9b5866fb45c694bbeafa119d6b9"
+    },
+    "shiny_quarto_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
+    },
+    "shiny_quarto_files/libs/quarto-html/axe/axe-check.js": {
+      "checksum": "b4f6a44157bfe20b68b69aabf2f8125d"
+    },
+    "shiny_quarto_files/libs/quarto-html/popper.min.js": {
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "shiny_quarto_files/libs/quarto-html/quarto-syntax-highlighting-dark-b651517ce65839d647a86e2780455cfb.css": {
+      "checksum": "b651517ce65839d647a86e2780455cfb"
+    },
+    "shiny_quarto_files/libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css": {
+      "checksum": "dc55a5b9e770e841cd82e46aadbfb9b0"
+    },
+    "shiny_quarto_files/libs/quarto-html/quarto.js": {
+      "checksum": "a65a7780c10232b6515cdfb8beaaa221"
+    },
+    "shiny_quarto_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
+    },
+    "shiny_quarto_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "shiny_quarto_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "ui.R": {
+      "checksum": "5cad43b65834f88e39e7e32f9cda98ae"
+    }
+  },
+  "users": null
+}
