@@ -7,11 +7,10 @@ library(purrr)
 library(here)
 
 ## Load in app files #### 
-# create an object that contains the names of the files needed to run the app
-files <- c("helpers.R", "ui.R", "server.R")
-
-# source each of the files and read it into the environment  
-purrr::map(files, ~source(here("R", .)))
+# # source each of the files and read it into the environment  
+source(here("helpers.R"))
+source(here("ui.R"))
+source(here("server.R"))
 
 ## Run the App #### 
 shiny::shinyApp(ui, server)
