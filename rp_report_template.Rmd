@@ -1,0 +1,58 @@
+---
+title: "`r params$year` Risk Policy Report for `r params$stock`"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: pdf_document
+params: # NA because they will be replaced by the shiny app parameters
+    year: NA
+    stock: NA 
+    fmp: NA 
+    matrix_tbl: NA
+    scores: NA
+    zscore: NA
+    RecProb: NA
+    zplot: NA
+    rationale: NA
+---
+```{r setup, include=FALSE}
+# set echo in all code chunks so they are not included in the output file
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE) 
+library(gt)
+library(tidyverse)
+library(flextable)
+```
+
+
+```{r matrix-ft}
+params$matrix_tbl |> 
+    flextable() |> 
+    merge_v() |> 
+    border_inner() |> 
+    width(width = c(1.5, 2.0, 3.5)) |> 
+    align(j = 3, align = "justify")
+```
+
+\newpage 
+
+## Scores and Weights 
+
+```{r scores}
+params$scores |> tab_options(latex.tbl.pos = "ht")
+```
+
+The calculated z-score is **`r params$zscore`**\
+\
+The recommended probability is **`r params$RecProb`**\  
+
+
+
+## Recommended Probability Plot
+
+```{r zplot}
+params$zplot
+```
+
+
+## SSC Rationale 
+
+`r if (params$rationale != ""){params$rationale} else {"No changes or additional rationale was provided."}`
+
