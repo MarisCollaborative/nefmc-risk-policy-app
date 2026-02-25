@@ -1,5 +1,7 @@
 # Helper functions ####
-library(tidyverse)
+library(dplyr)
+library(stringr)
+library(ggplot2)
 library(here)
 library(nefishr)
 
@@ -102,7 +104,7 @@ clean_scores <- function(data){
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "score") |> 
-    mutate(score = as.integer(score),
+    dplyr::mutate(score = as.integer(score),
            scaled_score = scale_val(score))
   
   return(scores)
@@ -139,17 +141,17 @@ clean_weights <- function(data){
 #' 
 #' 
 plot_zscore <- function(data, xcol, ycol, ...){
-    ggplot() + 
-        lims(x = c(-2,4), y = c(0,1))+
-        geom_function(fun = calc_recprob, linewidth = 1) + 
-        geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
-        geom_point(data = data, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
-        scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Recommended\nProbability" = "#3e9eb6")) +
+    ggplot2::ggplot() + 
+        ggplot2::lims(x = c(-2,4), y = c(0,1))+
+        ggplot2::geom_function(fun = calc_recprob, linewidth = 1) + 
+        ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
+        ggplot2::geom_point(data = data, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
+        ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Recommended\nProbability" = "#3e9eb6")) +
         # annotate(geom = 'shadowtext', x = {{x}}, y = {{y}}, label = input$dataset, color = 'blue', size = 6, bg.colour = 'white', vjust = -0.75)+
         # annotate(geom = 'text', x = 3, y = 0.5, label = 'MSA 50%\nprobability limit', color = 'red', size = 4, vjust = -0.4)+
-        labs(x = 'Z-Score', y = 'Recommended Probability') +
-        theme_bw() +
-        theme(axis.title = element_text(size = rel(1.25)),
+        ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
+        ggplot2::theme_bw() +
+        ggplot2::theme(axis.title = element_text(size = rel(1.25)),
               axis.text = element_text(size = rel(1.25)), 
               legend.position = "bottom", 
               legend.title = element_text(size = rel(1.25)),
