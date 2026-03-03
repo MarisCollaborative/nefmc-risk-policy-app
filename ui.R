@@ -10,13 +10,14 @@ library(surveydown)
 library(shinyjs)
 
 # connect to survey database
-db <- sd_db_connect()
+# db <- sd_db_connect()
 
 # fetch the risk policy scores from the database 
-data <- sd_get_data(db, "rp-scores")
+# data <- sd_get_data(db, "rp-scores")
 
 # identify the unique values of report year that occur in the table
-year_vals <- unique(data$report_year) |> sort()
+# year_vals <- unique(data$report_year) |> sort()
+year_vals <- readRDS(here("data", "year_vals.rds"))
 
 # identify the unique values of Stock Name from the nefmc_species dataframe in the nefishr package
 stock_vals <- unique(nefishr::nefmc_species$STOCK_NAME) |> sort()
@@ -35,30 +36,33 @@ ui <- fluidPage(
                 id = "sidebar", 
                 width = 350, 
                 open = T, # default to open
+                # Instructions:
+                p(em("Use the dropdown menus to select parameters for filtering data throughout the application:")),
                 # Inputs: 
                 ## Year selection 
                 selectInput(inputId = "year", 
-                      label = "Action Year", 
+                      label = strong("Action Year"), 
                       choices = c("Select a year...", year_vals), # using the unique year values from the scoring table
                       selected = "Select a year..."), # the initial value shown when the user starts the app 
 
                 ## FMP selection
                 selectInput(inputId = 'fmp', 
-                      label = 'Select FMP', 
+                      label = strong("Select FMP"), 
                       choices = c("Select an FMP...", fmp_vals), # using the unique fmp values from the nefmc_species table
                       selected = "Select an FMP..."), # the initial value shown when the user starts the app 
                 
                 ## Stock selection
                 selectInput(inputId = 'stock', 
-                            label = 'Select stock', 
+                            label = strong("Select stock"), 
                             choices = c("Select a stock...", stock_vals), # using the unique stock values from the nefmc_species table
                             selected = "Select a stock..."), # the initial value shown when the user starts the app
-                
+                br(), 
                 # Generate Report button
                 downloadButton("report", "Generate report")
+                  # uiOutput("downloadReport")
                 ),
               # Page 1 - shows the matrix table based on the sidebar inputs
-              nav_panel(title = "Matrix", 
+              nav_panel(title = "Matrix",
                         gt_output("matrix")
                         ), 
               # Page 2 - shows the recommended probability information based on user inputs and contains
@@ -67,6 +71,8 @@ ui <- fluidPage(
                     navset_card_tab( 
                         # a shared sidebar to change the factors by one level 
                         sidebar = sidebar(id = "changeFactors",
+                        # Instructions
+                        p(em("Use the sliders to increase or decrease scores of respective factors. When sliders are ready, click 'Make Changes' to change the factor scores, and resulting Z-score and recommended probability. Reset scores back to their original values and sliders to 0 by clicking 'Reset Scores.'")),
                         sliderInput('changeBiomass', "Biomass", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeRecruitment', "Recruitment", min = -1, max = 1, value = 0, step = 1),
                         sliderInput('changeClimate', "Climate Vulnerability", min = -1, max = 1, value = 0, step = 1),
@@ -79,10 +85,18 @@ ui <- fluidPage(
                         # a table of data with PDT scores and Council weightings, and text containing the calculated z-score and recommended probabilities
                         nav_panel("Z-score Data", 
                                   gt_output("scores"),
+                                  p(strong("The Z-score value based on the scores and weights table above:")),
                                   verbatimTextOutput('zscore', placeholder = T), 
-                                  verbatimTextOutput('RecProb', placeholder = T)), 
+                                  p(strong("The recommended probability based on the calculated z-score:")),
+                                  verbatimTextOutput('AlphaProb', placeholder = T)), 
                         # a plot of the calculated Z-score and recommended probability based on the scores and weights
-                        nav_panel("Z-score Plot", plotOutput("zplot")),
+                        nav_panel("Alpha Z-score Plot", plotOutput("alpha_plot")),
+                        nav_panel("Beta Z-score Plot", 
+                                  plotOutput("ab_plot"),
+                                  p(strong("The recommended probability based on an updated logisitic curve:")),
+                                  verbatimTextOutput('BetaProb', placeholder = T),
+                                  p(strong("The percent difference between recommended probabilities based on the two logistic curves:")),
+                                  verbatimTextOutput('PercDiff', placeholder = T))
                                         ),
                   # and a text area for user input if there is a decision to change a score(s) and ultimately the recommended probability for a given stock in a given year
                   card(textAreaInput(inputId = "rationale", 

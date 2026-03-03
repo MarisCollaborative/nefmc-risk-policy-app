@@ -9,6 +9,7 @@ library(gt)
 library(DT)
 library(surveydown)
 library(shinyjs)
+
 source(here("helpers.R")) # read in helper functions
 # connect to the database for fetching data
 db <- surveydown::sd_db_connect()
@@ -17,6 +18,11 @@ db <- surveydown::sd_db_connect()
 server <- function(input, output, session) {
 
 ## Server Parameters #### =============================================================
+# disable report button upon start up
+observe({
+  shinyjs::disable(id = "report")
+})
+
 # create reactive element for selected year 
 year <- reactive(input$year)
   
@@ -38,6 +44,12 @@ observeEvent(input$fmp, {
 # create reactive element for selected stock
 stock <- reactive(input$stock)
 
+observe({
+  if (req(input$stock) != "Select a stock...") {
+    enable("report")
+  }
+})
+
 ## Fetch data #### ====================================================================
 ## get risk policy data from the database
 # a reactive object containing results from the matrix survey
@@ -48,12 +60,14 @@ info <- sd_get_data(db,
 # a static object containing results from the weightings survey
 weights <- sd_get_data(db, table = "rp-weights") |> 
     clean_weights() # uses helper function to tidy the data and columns 
+# weights <- readRDS(here("data", "weights.rds"))
   
 # a static object containing results from the scoring survey
 scores <- sd_get_data(db, table = "rp-scores") |> 
     clean_scores() |> # uses helper function to tidy the data and columns 
     filter(!factor %in% str_subset(factor, "rationale")) # removes observations containing rationale for a given score
-
+# scores <- readRDS(here("data", "scores.rds"))
+  
 # create a static data frame containing the scores and weights for each factor
 z_data <- left_join(scores, weights, by = c("report_year", "factor"))
 
@@ -74,16 +88,24 @@ matrix_tbl  <- reactive({
 })
 
 # Render a GT table using the reactive info object containing the answers from the matrix survey
-output$matrix <- render_gt({ 
+output$matrix <- render_gt({
+  
+  # does not show the matrix until the inputs are selected
+   if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+    return(NULL)
+  }
 
-     matrix_tbl() |>
+    matrix_tbl() |>
       gt(rowname_col = "value", 
          groupname_col = "factor", # group rows based on the factor column
          row_group_as_column = TRUE) |> 
       text_case_match(
         NA ~ "Not provided", # where there is an NA replace with "Not provided"
         .locations = cells_body(answer) # in the answer column
-      ) |>       
+      ) |> 
+      cols_label(
+        answer = md("Supporting Information")
+      ) |>
       tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) |> # create a table header using the user inputs
       opt_align_table_header(align = "left") 
   
@@ -93,8 +115,8 @@ output$matrix <- render_gt({
 ## Page 2: Scores, Weights, Plots #### ================================================
 ### Initial Reactives ####==============================================================
 # create reactive objects based on slider inputs for each factors; stores the value from the slider 
-biomass <- reactive(input$changeBiomass)
-recruitment <- reactive(input$changeRecruitment)
+biomass <- reactive(input$changeBiomass*2)
+recruitment <- reactive(input$changeRecruitment*2)
 climate <- reactive(input$changeClimate)
 commercial <- reactive(input$changeCommercial)
 recreational <- reactive(input$changeRecreational)
@@ -145,12 +167,31 @@ observeEvent(input$resetScores, {
 
   
 ### Final Reactives #### ================================================================
+original_zvals <- reactive({
+  zdata_rv$original |> 
+    filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
+    summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
+              alpha_recprob = alpha_recprob(zscore), 
+              beta_recprob = beta_recprob(zscore), 
+              perc.diff = percent.diff(alpha_recprob, beta_recprob))
+})
+
 # Using the "Updated Reactive Value" (regardless of it's state), create a reactive object
 zscore_vals <- reactive({
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
     summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
-              rec_prob = calc_recprob(zscore)) # the recommended probablity using a helper function
+              alpha_recprob = alpha_recprob(zscore), 
+              beta_recprob = beta_recprob(zscore), 
+              perc.diff = percent.diff(alpha_recprob, beta_recprob)) # the recommended probablity using a helper function
+  # map(zdata_rv, 
+  #   ~filter(., report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
+  #   summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
+  #             alpha_recprob = alpha_recprob(zscore), 
+  #             beta_recprob = beta_recprob(zscore), 
+  #             perc.diff = percent.diff(alpha_recprob, beta_recprob), # the recommended probablity using a helper function
+  #             .by = c("report_year", "stock"))
+  # )
 
 })
 
@@ -159,19 +200,58 @@ final_scores <- reactive({
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock
     select(!c(scaled_score, normalized_weight)) |> 
-    gt()
+    gt() |> 
+    text_transform(str_to_title, locations = cells_body(columns = factor)) |> 
+    cols_label(
+      avg_weight = "Average Weight"
+    ) |> 
+    cols_label_with(
+    fn = function(x) {
+      janitor::make_clean_names(x, case = "title") |>
+        stringr::str_replace_all("_", " ") |>
+        md()
+    }
+  ) |> 
+    cols_align(align = "left", 
+               columns = c(report_year, stock, factor)) |> 
+    cols_align(align = "right", 
+               columns = c(score, avg_weight))
 })
   
 #  Using the zscore_vals reactive object, pull out the zscore value and save in its own reactive for the app and report
 zscore <- reactive({
   zscore_vals()$zscore
+  # zscore_vals()$updated$zscore
 })
 
 #  Using the zscore_vals reactive object, pull out the recommended probability value and save in its own reactive for the app and report
-RecProb <- reactive({
+alpha_prob <- reactive({
     str_c( # creating a string that includes: 
       round( # the rounded product of 
-        zscore_vals()$rec_prob*100, # the rec_prob value multiplied by 100
+        zscore_vals()$alpha_recprob*100, # the rec_prob value multiplied by 100
+        #  zscore_vals()$updated$alpha_recprob*100, 
+        1 # to the nearest tenth,
+      ),
+      "%", # and a percent sign,  
+      sep = "") # without any separating space or punctuation
+})
+  
+beta_prob <- reactive({
+    str_c( # creating a string that includes: 
+      round( # the rounded product of 
+        zscore_vals()$beta_recprob*100, # the rec_prob value multiplied by 100
+        #  zscore_vals()$updated$beta_recprob*100, 
+        1 # to the nearest tenth,
+      ),
+      "%", # and a percent sign,  
+      sep = "") # without any separating space or punctuation
+})
+
+prob_diff <- reactive({
+    str_c( # creating a string that includes: 
+      round( # the rounded product of 
+        zscore_vals()$perc.diff*100, # 
+        #  zscore_vals()$updated$perc.diff*100, 
         1 # to the nearest tenth,
       ),
       "%", # and a percent sign,  
@@ -179,19 +259,38 @@ RecProb <- reactive({
 })
 
 #  Using the zscore_vals reactive object, create a reactive plot that plots the score and recommended probability
-zplot <- reactive({
-  plot_zscore(data = zscore_vals(), # helper function for plotting the z-score function
+alpha_plot <- reactive({
+
+  plot_alpha(data = original_zvals(), # helper function for plotting the z-score function
+    # data = zscore_vals()$updated,
     xcol = zscore, # and values
-    ycol = rec_prob)
+    ycol = alpha_recprob, 
+    color = "gray") + 
+    ggplot2::geom_point(data = zscore_vals(), 
+  aes(x = zscore, y = alpha_recprob), color = "#3e9eb6", size = 4) 
 })
 
+ab_plot <- reactive({
+  plot_abprob(data = zscore_vals(), # helper function for plotting the z-score function
+    # data = zscore_vals()$updated,
+    z = zscore, # and values
+    alpha = alpha_recprob, 
+    beta = beta_recprob) +
+    labs(subtitle = "This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the\nAlpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy.") + 
+    theme(plot.subtitle = element_text(size = 14))
+})
 
 ## Outputs ####
   
 # Render the GT table output using the data reactive
 output$scores <- render_gt({
+  
+  if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+    return(NULL)
+  }
 
-   final_scores() 
+   final_scores() |> 
+    tab_options(table.width = pct(80))
     
 })
 
@@ -203,18 +302,36 @@ output$zscore <- renderText(
   )
 
 # Print the recommended probability value by
-output$RecProb <- renderText(
+output$AlphaProb <- renderText(
     
-  RecProb()
+  alpha_prob()
 
 )
 
 # Plot the z-score and recommended probability values
-output$zplot <- renderPlot({
+output$alpha_plot <- renderPlot({
 
-  zplot()
+  alpha_plot()
   
 })
+  
+output$ab_plot <- renderPlot({
+
+  ab_plot()
+  
+})
+  
+output$BetaProb <- renderText(
+    
+  beta_prob()
+
+)
+
+output$PercDiff <- renderText(
+    
+  prob_diff()
+
+)
   
 ## Report #### =====================================================================
 # create a temporary file location
