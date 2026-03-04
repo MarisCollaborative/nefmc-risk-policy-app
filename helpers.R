@@ -38,7 +38,7 @@ alpha_recprob <- function(z){ 1/(1+exp(-z)) }
 #' 
 #' 
 #' 
-beta_recprob <- function(z){ 0.5 + (0.5/(1+exp(2*(-z+2)))) }
+beta_recprob <- function(z){ 0.5 + (0.5/(1+exp(-z))) }
 
 ### Percent difference ####
 percent.diff <- function(x1, x2) {
@@ -177,7 +177,7 @@ plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
 #' 
 plot_abprob <- function(data, z, alpha, beta){
     ggplot2::ggplot() + 
-        ggplot2::lims(x = c(0,4), y = c(0,1))+
+        ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
         ggplot2::geom_function(fun = alpha_recprob, linewidth = 1, lty = 2) + 
         ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{alpha}}, color = "Alpha\nRecommended\nProbability"), size = 4) +
         ggplot2::geom_function(fun = beta_recprob, linewidth = 1, lty = 3) + 
