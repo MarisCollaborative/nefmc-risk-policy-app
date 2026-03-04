@@ -23,9 +23,18 @@ library(flextable)
 
 
 ```{r matrix-ft}
+set_flextable_defaults(na_str = "")
+
 params$matrix_tbl |> 
+    mutate(answer = case_when(
+        is.na(answer) ~ "Not Provided", 
+        TRUE ~ answer
+    )) |> 
     flextable() |> 
-    merge_v() |> 
+    merge_v(j = "factor") |> 
+    set_header_labels(facor = "Factor", 
+                      value = "Value", 
+                      answer = "Supporting Information") |> 
     border_inner() |> 
     width(width = c(1.5, 2.0, 3.5)) |> 
     align(j = 3, align = "justify")
@@ -36,7 +45,7 @@ params$matrix_tbl |>
 ## Scores and Weights 
 
 ```{r scores}
-params$scores |> tab_options(table.width = pct(80), latex.tbl.pos = "ht") |> 
+params$scores |> tab_options(table.width = pct(80), latex.tbl.pos = "ht") 
 ```
 
 The calculated z-score is **`r params$zscore`**\
