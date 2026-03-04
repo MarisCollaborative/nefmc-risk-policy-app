@@ -10,14 +10,14 @@ library(surveydown)
 library(shinyjs)
 
 # connect to survey database
-# db <- sd_db_connect()
+db <- sd_db_connect()
 
 # fetch the risk policy scores from the database 
-# data <- sd_get_data(db, "rp-scores")
+data <- sd_get_data(db, "rp-scores")
 
 # identify the unique values of report year that occur in the table
-# year_vals <- unique(data$report_year) |> sort()
-year_vals <- readRDS(here("data", "year_vals.rds"))
+year_vals <- unique(data$report_year) |> sort()
+
 
 # identify the unique values of Stock Name from the nefmc_species dataframe in the nefishr package
 stock_vals <- unique(nefishr::nefmc_species$STOCK_NAME) |> sort()
