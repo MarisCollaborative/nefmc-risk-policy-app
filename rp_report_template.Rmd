@@ -36,7 +36,7 @@ params$matrix_tbl |>
 ## Scores and Weights 
 
 ```{r scores}
-params$scores |> tab_options(latex.tbl.pos = "ht")
+params$scores |> tab_options(table.width = pct(80), latex.tbl.pos = "ht") |> 
 ```
 
 The calculated z-score is **`r params$zscore`**\

@@ -363,8 +363,8 @@ output$report <- downloadHandler(
                    matrix_tbl = matrix_tbl(),
                    scores = final_scores(), 
                    zscore = zscore(), 
-                   RecProb = RecProb(), 
-                   zplot = zplot(), 
+                   RecProb = alpha_prob(), 
+                   zplot = alpha_plot(), 
                    rationale = rationale()
                   )
     # debug params
