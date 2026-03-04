@@ -38,7 +38,7 @@ alpha_recprob <- function(z){ 1/(1+exp(-z)) }
 #' 
 #' 
 #' 
-beta_recprob <- function(z){ 0.5 + (0.5/(1+exp(-z))) }
+beta_recprob <- function(z){ 0.5 + (0.5/(1+exp(z))) }
 
 ### Percent difference ####
 percent.diff <- function(x1, x2) {
