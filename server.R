@@ -60,13 +60,13 @@ info <- sd_get_data(db,
 # a static object containing results from the weightings survey
 weights <- sd_get_data(db, table = "rp-weights") |> 
     clean_weights() # uses helper function to tidy the data and columns 
-# weights <- readRDS(here("data", "weights.rds"))
+
   
 # a static object containing results from the scoring survey
 scores <- sd_get_data(db, table = "rp-scores") |> 
     clean_scores() |> # uses helper function to tidy the data and columns 
     filter(!factor %in% str_subset(factor, "rationale")) # removes observations containing rationale for a given score
-# scores <- readRDS(here("data", "scores.rds"))
+
   
 # create a static data frame containing the scores and weights for each factor
 z_data <- left_join(scores, weights, by = c("report_year", "factor"))
@@ -363,8 +363,8 @@ output$report <- downloadHandler(
                    matrix_tbl = matrix_tbl(),
                    scores = final_scores(), 
                    zscore = zscore(), 
-                   RecProb = RecProb(), 
-                   zplot = zplot(), 
+                   RecProb = alpha_prob(), 
+                   zplot = alpha_plot(), 
                    rationale = rationale()
                   )
     # debug params
