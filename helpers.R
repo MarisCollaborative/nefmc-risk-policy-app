@@ -91,7 +91,7 @@ clean_matrix <- function(data){
     dplyr::mutate(value = dplyr::case_when(
                         value == "ssb" ~ "SSB",
                         value == "relative_ssb" ~ "Relative SSB",
-                        value == "recruit_incl" ~ " Recruitment is estimated", 
+                        value == "recruit_incl" ~ "Recruitment is estimated", 
                         value == "beg_recruit_yr" ~ "Initial year of time series",
                         value == "retro_pattern" ~ "Retrospective Pattern", 
                         value == "retro_val" ~ "Retrospective Values",
@@ -100,6 +100,14 @@ clean_matrix <- function(data){
                         value %in% stringr::str_subset(value, "[:lower:]") ~ stringr::str_to_title(stringr::str_replace_all(value, "_", " ")),
                         TRUE ~ str_replace_all(value, "_", " ")),
                   answer = str_replace_all(answer, "_", " "))
+  
+  ### Reorder the factors so assessment and uncertainty is first. 
+  #1) create an object containing the factor names in the desired order
+  reorder_levels <- c("Assessment and Uncertainty", "Biomass", "Recruitment", "Climate Vulnerability", "Commercial Fishery Characterization", "Additional Information")
+ 
+  #2) use the object to overwrite the default levels of the factor column
+  matrix <- matrix |> 
+    mutate(factor = factor(factor, levels = reorder_levels))
 
   return(matrix)
 

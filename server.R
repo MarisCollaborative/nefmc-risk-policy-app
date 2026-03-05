@@ -83,8 +83,8 @@ matrix_tbl  <- reactive({
   info() |> 
       clean_matrix() |> # helper function to tidy the data and columns 
       filter(report_year == year() & stock == stock()) |> # filter for user inputs
-      select(!c(report_year, stock)) # remove stock and year from table once filtered
-  
+      select(!c(report_year, stock)) |>  # remove stock and year from table once filtered
+      arrange(factor) # arrange the table based on the assigned levels of the 'factor' column
 })
 
 # Render a GT table using the reactive info object containing the answers from the matrix survey
