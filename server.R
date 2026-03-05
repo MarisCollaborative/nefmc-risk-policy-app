@@ -173,7 +173,11 @@ original_zvals <- reactive({
     summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
               alpha_recprob = alpha_recprob(zscore), 
               beta_recprob = beta_recprob(zscore), 
-              perc.diff = percent.diff(alpha_recprob, beta_recprob))
+              perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> 
+    mutate(alpha_recprob = case_when(
+      alpha_recprob < 0.5 ~ 0.5, 
+      TRUE ~ alpha_recprob)
+    )
 })
 
 # Using the "Updated Reactive Value" (regardless of it's state), create a reactive object
@@ -183,7 +187,11 @@ zscore_vals <- reactive({
     summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
               alpha_recprob = alpha_recprob(zscore), 
               beta_recprob = beta_recprob(zscore), 
-              perc.diff = percent.diff(alpha_recprob, beta_recprob)) # the recommended probablity using a helper function
+              perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> # the recommended probablity using a helper function
+    mutate(alpha_recprob = case_when(
+      alpha_recprob < 0.5 ~ 0.5, 
+      TRUE ~ alpha_recprob)
+    )
   # map(zdata_rv, 
   #   ~filter(., report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
   #   summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
