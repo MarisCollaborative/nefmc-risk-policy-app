@@ -283,9 +283,9 @@ ab_plot <- reactive({
     # data = zscore_vals()$updated,
     z = zscore, # and values
     alpha = alpha_recprob, 
-    beta = beta_recprob) +
-    labs(subtitle = "This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the\nAlpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy.") + 
-    theme(plot.subtitle = element_text(size = 14))
+    beta = beta_recprob) #+
+    # labs(subtitle = "This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the\nAlpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy.") + 
+    # theme(plot.subtitle = element_text(size = 14))
 })
 
 ## Outputs ####

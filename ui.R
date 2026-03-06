@@ -92,6 +92,7 @@ ui <- fluidPage(
                         # a plot of the calculated Z-score and recommended probability based on the scores and weights
                         nav_panel("Alpha Z-score Plot", plotOutput("alpha_plot")),
                         nav_panel("Beta Z-score Plot", 
+                                  p("This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the Alpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy."),
                                   plotOutput("ab_plot"),
                                   p(strong("The recommended probability based on an updated logisitic curve:")),
                                   verbatimTextOutput('BetaProb', placeholder = T),

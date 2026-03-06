@@ -175,7 +175,7 @@ plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
               legend.title = element_text(size = rel(1.25)),
               legend.text = element_text(size = rel(1.25)), 
               legend.key.spacing = unit(0.5, "cm")) + 
-        ggplot2::coord_fixed(ratio = 3/1)
+        ggplot2::coord_fixed(ratio = 2)
 }
 
 
@@ -200,5 +200,5 @@ plot_abprob <- function(data, z, alpha, beta){
               legend.title = element_text(size = rel(1.25)),
               legend.text = element_text(size = rel(1.25)), 
               legend.key.spacing = unit(0.5, "cm")) + 
-        ggplot2::coord_fixed(ratio = 3/1)
+        ggplot2::coord_fixed(ratio = 8)
 }
