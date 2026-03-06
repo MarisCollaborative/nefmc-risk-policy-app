@@ -162,7 +162,7 @@ clean_weights <- function(data){
 #' 
 plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
     ggplot2::ggplot() + 
-        ggplot2::lims(x = c(0,4), y = c(0,1))+
+        ggplot2::lims(x = c(0,4), y = c(0.5,1))+
         ggplot2::geom_function(fun = alpha_recprob, linewidth = 1) + 
         ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
         ggplot2::geom_point(data = {{ data }}, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
@@ -175,7 +175,7 @@ plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
               legend.title = element_text(size = rel(1.25)),
               legend.text = element_text(size = rel(1.25)), 
               legend.key.spacing = unit(0.5, "cm")) + 
-        ggplot2::coord_fixed(ratio = 2)
+        ggplot2::coord_fixed(ratio = 4)
 }
 
 
