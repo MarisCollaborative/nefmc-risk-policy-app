@@ -18,26 +18,39 @@ params: # NA because they will be replaced by the shiny app parameters
 knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE) 
 library(gt)
 library(tidyverse)
-library(flextable)
+# library(flextable)
+library(kableExtra)
 ```
 
 
 ```{r matrix-ft}
-set_flextable_defaults(na_str = "")
+# set_flextable_defaults(na_str = "")
 
+# params$matrix_tbl |> 
+#     mutate(answer = case_when(
+#         is.na(answer) ~ "Not Provided", 
+#         TRUE ~ answer
+#     )) |> 
+#     flextable() |> 
+#     merge_v(j = "factor") |> 
+#     set_header_labels(facor = "Factor", 
+#                       value = "Value", 
+#                       answer = "Supporting Information") |> 
+#     border_inner() |> 
+#     width(width = c(1.5, 2.0, 3.5)) |> 
+#     align(j = 3, align = "justify")
+```
+
+```{r matrix-kbl}
 params$matrix_tbl |> 
-    mutate(answer = case_when(
-        is.na(answer) ~ "Not Provided", 
-        TRUE ~ answer
-    )) |> 
-    flextable() |> 
-    merge_v(j = "factor") |> 
-    set_header_labels(facor = "Factor", 
-                      value = "Value", 
-                      answer = "Supporting Information") |> 
-    border_inner() |> 
-    width(width = c(1.5, 2.0, 3.5)) |> 
-    align(j = 3, align = "justify")
+    rename_all(str_to_title) |> 
+    rename("Supporting Information" = "Answer") |> 
+    knitr::kable(booktabs = T) |> 
+    kable_styling(latex_options = c("hold_position", "scale_down"), position = "float_left", fixed_thead = T) |>
+    column_spec(column = 1:2, width = "3cm") |> 
+    collapse_rows(columns = 1, valign = "top", latex_hline = "full", longtable_clean_cut = F) |> 
+    column_spec(column = 3, width = "10cm")
+
 ```
 
 \newpage 
