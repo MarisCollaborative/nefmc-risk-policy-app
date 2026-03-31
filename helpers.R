@@ -183,11 +183,11 @@ plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
 #' Plots alpha and beta functions on the same pane to show differences in z-scores between approaches
 #' 
 #' 
-plot_abprob <- function(data, z, alpha, beta){
+plot_abprob <- function(data, z, alpha = NULL, beta){
     ggplot2::ggplot() + 
         ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
-        ggplot2::geom_function(fun = alpha_recprob, linewidth = 1, lty = 2) + 
-        ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{alpha}}, color = "Alpha\nRecommended\nProbability"), size = 4) +
+        # ggplot2::geom_function(fun = alpha_recprob, linewidth = 1, lty = 2) + 
+        # ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{alpha}}, color = "Alpha\nRecommended\nProbability"), size = 4) +
         ggplot2::geom_function(fun = beta_recprob, linewidth = 1, lty = 3) + 
         ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
         ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{beta}}, color = "Beta\nRecommended\nProbability"), size = 4) +

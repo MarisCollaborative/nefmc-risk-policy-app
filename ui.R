@@ -8,9 +8,10 @@ library(nefishr)
 library(gt)
 library(surveydown)
 library(shinyjs)
+library(bsicons)
 
 # connect to survey database
-db <- sd_db_connect()
+db <- sd_db_connect(".env")
 
 # fetch the risk policy scores from the database 
 data <- sd_get_data(db, "rp-scores")
@@ -67,38 +68,54 @@ ui <- fluidPage(
                         ), 
               # Page 2 - shows the recommended probability information based on user inputs and contains
               nav_panel(title = "Recommended Probability",
-                    # a multi-tab card with  
-                    navset_card_tab( 
-                        # a shared sidebar to change the factors by one level 
-                        sidebar = sidebar(id = "changeFactors",
-                        # Instructions
-                        p(em("Use the sliders to increase or decrease scores of respective factors. When sliders are ready, click 'Make Changes' to change the factor scores, and resulting Z-score and recommended probability. Reset scores back to their original values and sliders to 0 by clicking 'Reset Scores.'")),
-                        sliderInput('changeBiomass', "Biomass", min = -1, max = 1, value = 0, step = 1),
-                        sliderInput('changeRecruitment', "Recruitment", min = -1, max = 1, value = 0, step = 1),
-                        sliderInput('changeClimate', "Climate Vulnerability", min = -1, max = 1, value = 0, step = 1),
-                        sliderInput('changeCommercial', "Commercial Fishery", min = -1, max = 1, value = 0, step = 1),
-                        sliderInput('changeRecreational', "Recreational Fishery", min = -1, max = 1, value = 0, step = 1), 
-                        # action buttons to manipulate the scores based on user input or restore the scores to their original values
+                    accordion(
+                      accordion_panel(
+                        title = "Change Recommended Probability",
+                        icon = bsicons::bs_icon("sliders"),
+                        p(em("Use the slider to increase or decrease the recommended probability. Reset values back to the original positions by clicking 'Reset Scores.'")),
+                        sliderInput('changeProb', "Change Recommend Probability value", min = -25, max = 25, value = 0, step = 1), 
                         actionButton('changeScores', "Make Changes"), 
                         actionButton('resetScores', "Reset Scores")
-                                          ),
+                      ), 
+                      id = "acc",  
+                      open = "Change Recommended Probability"
+                    ),
+                    # a multi-tab card with  
+                    # navset_card_tab( 
+                        # a shared sidebar to change the factors by one level 
+                        # sidebar = sidebar(id = "changeFactors",
+                        # Instructions
+                        # p(em("Use the sliders to increase or decrease scores of respective factors. When sliders are ready, click 'Make Changes' to change the factor scores, and resulting Z-score and recommended probability. Reset scores back to their original values and sliders to 0 by clicking 'Reset Scores.'")),
+                        # sliderInput('changeBiomass', "Biomass", min = -1, max = 1, value = 0, step = 1),
+                        # sliderInput('changeRecruitment', "Recruitment", min = -1, max = 1, value = 0, step = 1),
+                        # sliderInput('changeClimate', "Climate Vulnerability", min = -1, max = 1, value = 0, step = 1),
+                        # sliderInput('changeCommercial', "Commercial Fishery", min = -1, max = 1, value = 0, step = 1),
+                        # sliderInput('changeRecreational', "Recreational Fishery", min = -1, max = 1, value = 0, step = 1), 
+                        # action buttons to manipulate the scores based on user input or restore the scores to their original values
+                        # actionButton('changeScores', "Make Changes"), 
+                        # actionButton('resetScores', "Reset Scores")
+                        #                   ),
                         # a table of data with PDT scores and Council weightings, and text containing the calculated z-score and recommended probabilities
-                        nav_panel("Z-score Data", 
+                        # nav_panel("Z-score Data", 
+                                  p(strong("Z-score Data")),
                                   gt_output("scores"),
                                   p(strong("The Z-score value based on the scores and weights table above:")),
                                   verbatimTextOutput('zscore', placeholder = T), 
                                   p(strong("The recommended probability based on the calculated z-score:")),
-                                  verbatimTextOutput('AlphaProb', placeholder = T)), 
-                        # a plot of the calculated Z-score and recommended probability based on the scores and weights
-                        nav_panel("Alpha Z-score Plot", plotOutput("alpha_plot")),
-                        nav_panel("Beta Z-score Plot", 
-                                  p("This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the Alpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy."),
-                                  plotOutput("ab_plot"),
-                                  p(strong("The recommended probability based on an updated logisitic curve:")),
+                                  # verbatimTextOutput('AlphaProb', placeholder = T)), 
                                   verbatimTextOutput('BetaProb', placeholder = T),
-                                  p(strong("The percent difference between recommended probabilities based on the two logistic curves:")),
-                                  verbatimTextOutput('PercDiff', placeholder = T))
-                                        ),
+                        # a plot of the calculated Z-score and recommended probability based on the scores and weights
+                        # nav_panel("Alpha Z-score Plot", plotOutput("alpha_plot")),
+                        # nav_panel("Z-score Plot", 
+                                  # p("This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the Alpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy."),
+                                  p(strong("Z-score Plot")),
+                                  plotOutput("ab_plot"),
+                                  # p(strong("The recommended probability based on the logisitic curve:")),
+                                  # verbatimTextOutput('BetaProb', placeholder = T)#,
+                                  # p(strong("The percent difference between recommended probabilities based on the two logistic curves:")),
+                                  # verbatimTextOutput('PercDiff', placeholder = T))
+                                        # ),
+                                      # ),
                   # and a text area for user input if there is a decision to change a score(s) and ultimately the recommended probability for a given stock in a given year
                   card(textAreaInput(inputId = "rationale", 
                                      label = "If you are recommending a change to a score, enter your rationale below.", 
