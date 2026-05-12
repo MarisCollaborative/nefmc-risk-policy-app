@@ -115,55 +115,55 @@ output$matrix <- render_gt({
 ## Page 2: Scores, Weights, Plots #### ================================================
 ### Initial Reactives ####==============================================================
 # create reactive objects based on slider inputs for each factors; stores the value from the slider 
-biomass <- reactive(input$changeBiomass*2)
-recruitment <- reactive(input$changeRecruitment*2)
-climate <- reactive(input$changeClimate)
-commercial <- reactive(input$changeCommercial)
-recreational <- reactive(input$changeRecreational)
-rationale <- reactive(input$rationale)
+# biomass <- reactive(input$changeBiomass*2)
+# recruitment <- reactive(input$changeRecruitment*2)
+# climate <- reactive(input$changeClimate)
+# commercial <- reactive(input$changeCommercial)
+# recreational <- reactive(input$changeRecreational)
+# rationale <- reactive(input$rationale)
   
   
 ### Score Manipulation ####================================================================
 # when the "Make Changes" button is pressed, the following operation is performed
-observeEvent(input$changeScores, {
-  #1. Create an object from the Updated Reactive Value
-  updated <- zdata_rv$updated |> 
-    filter(report_year == year(), stock == stock()) # filter for the user inputs for year and stock 
+# observeEvent(input$changeScores, {
+#   #1. Create an object from the Updated Reactive Value
+#   updated <- zdata_rv$updated |> 
+#     filter(report_year == year(), stock == stock()) # filter for the user inputs for year and stock 
       
-  #2. Update the each score cell based on the user input slider values above
-  ### Biomass score
-  updated[updated$factor=="biomass", "score"] <- updated[updated$factor=="biomass", "score"] + biomass()
-  ### Recruitment score
-  updated[updated$factor=="recruitment", "score"] <- updated[updated$factor=="recruitment", "score"] + recruitment()
-  ### Climate score
-  updated[updated$factor=="climate", "score"] <- updated[updated$factor=="climate", "score"] + climate()
-  ### Commercial Fishery score
-  updated[updated$factor=="commercial", "score"] <- updated[updated$factor=="commercial", "score"] + commercial()
-  ### Recreational Fishery score
-  updated[updated$factor=="recreational", "score"] <- updated[updated$factor=="recreational", "score"] + recreational()
+#   #2. Update the each score cell based on the user input slider values above
+#   ### Biomass score
+#   updated[updated$factor=="biomass", "score"] <- updated[updated$factor=="biomass", "score"] + biomass()
+#   ### Recruitment score
+#   updated[updated$factor=="recruitment", "score"] <- updated[updated$factor=="recruitment", "score"] + recruitment()
+#   ### Climate score
+#   updated[updated$factor=="climate", "score"] <- updated[updated$factor=="climate", "score"] + climate()
+#   ### Commercial Fishery score
+#   updated[updated$factor=="commercial", "score"] <- updated[updated$factor=="commercial", "score"] + commercial()
+#   ### Recreational Fishery score
+#   updated[updated$factor=="recreational", "score"] <- updated[updated$factor=="recreational", "score"] + recreational()
     
-  #3. Rescale the scores based on the updated values from #2 
-  updated$scaled_score <- scale_val(updated$score, 4) # helper function
+#   #3. Rescale the scores based on the updated values from #2 
+#   updated$scaled_score <- scale_val(updated$score, 4) # helper function
     
-  #4. Overwrite the "Updated Reactive value" with the manipulated data
-  zdata_rv$updated <- updated
-})  
+#   #4. Overwrite the "Updated Reactive value" with the manipulated data
+#   zdata_rv$updated <- updated
+# })  
   
 # when the "Reset Scores" button is pressed, the following operation is performed
-observeEvent(input$resetScores, {
+# observeEvent(input$resetScores, {
     
-    #1. Overwrite the "Updated Reactive value" with the "Original Reactive value"
-    zdata_rv$updated <- zdata_rv$original |> 
-      filter(report_year == year(), stock == stock()) # filtered by user inputs for year and stock
+#     #1. Overwrite the "Updated Reactive value" with the "Original Reactive value"
+#     zdata_rv$updated <- zdata_rv$original |> 
+#       filter(report_year == year(), stock == stock()) # filtered by user inputs for year and stock
   
-    #2. Reset the sliders to 0 
-    shinyjs::reset("changeBiomass")
-    shinyjs::reset("changeRecruitment")
-    shinyjs::reset("changeClimate")
-    shinyjs::reset("changeCommercial")
-    shinyjs::reset("changeRecreational")
+#     #2. Reset the sliders to 0 
+#     shinyjs::reset("changeBiomass")
+#     shinyjs::reset("changeRecruitment")
+#     shinyjs::reset("changeClimate")
+#     shinyjs::reset("changeCommercial")
+#     shinyjs::reset("changeRecreational")
   
-})
+# })
 
   
 ### Final Reactives #### ================================================================
@@ -171,13 +171,13 @@ original_zvals <- reactive({
   zdata_rv$original |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
     summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
-              alpha_recprob = alpha_recprob(zscore), 
-              beta_recprob = beta_recprob(zscore), 
-              perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> 
-    mutate(alpha_recprob = case_when(
-      alpha_recprob < 0.5 ~ 0.5, 
-      TRUE ~ alpha_recprob)
-    )
+              # alpha_recprob = alpha_recprob(zscore), 
+              RecProb= calcRecProb(zscore))#,  # calculate the recommended probability using the logistic function
+    #           perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> 
+    # mutate(alpha_recprob = case_when(
+    #   alpha_recprob < 0.5 ~ 0.5, 
+    #   TRUE ~ alpha_recprob)
+    # )
 })
 
 # Using the "Updated Reactive Value" (regardless of it's state), create a reactive object
@@ -185,13 +185,13 @@ zscore_vals <- reactive({
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
     summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
-              alpha_recprob = alpha_recprob(zscore), 
-              beta_recprob = beta_recprob(zscore), 
-              perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> # the recommended probablity using a helper function
-    mutate(alpha_recprob = case_when(
-      alpha_recprob < 0.5 ~ 0.5, 
-      TRUE ~ alpha_recprob)
-    )
+              # alpha_recprob = alpha_recprob(zscore), 
+              RecProb = calcRecProb(zscore))#,  # calculate the recommended probability using the logistic function
+              # perc.diff = percent.diff(alpha_recprob, beta_recprob)) #|> # the recommended probablity using a helper function
+    # mutate(alpha_recprob = case_when(
+    #   alpha_recprob < 0.5 ~ 0.5, 
+    #   TRUE ~ alpha_recprob)
+    # )
   # map(zdata_rv, 
   #   ~filter(., report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
   #   summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
@@ -233,21 +233,21 @@ zscore <- reactive({
 })
 
 #  Using the zscore_vals reactive object, pull out the recommended probability value and save in its own reactive for the app and report
-alpha_prob <- reactive({
-    str_c( # creating a string that includes: 
-      round( # the rounded product of 
-        zscore_vals()$alpha_recprob*100, # the rec_prob value multiplied by 100
-        #  zscore_vals()$updated$alpha_recprob*100, 
-        1 # to the nearest tenth,
-      ),
-      "%", # and a percent sign,  
-      sep = "") # without any separating space or punctuation
-})
+# alpha_prob <- reactive({
+#     str_c( # creating a string that includes: 
+#       round( # the rounded product of 
+#         zscore_vals()$alpha_recprob*100, # the rec_prob value multiplied by 100
+#         #  zscore_vals()$updated$alpha_recprob*100, 
+#         1 # to the nearest tenth,
+#       ),
+#       "%", # and a percent sign,  
+#       sep = "") # without any separating space or punctuation
+# })
   
-beta_prob <- reactive({
+RecProb <- reactive({
     str_c( # creating a string that includes: 
       round( # the rounded product of 
-        zscore_vals()$beta_recprob*100, # the rec_prob value multiplied by 100
+        zscore_vals()$RecProb*100, # the rec_prob value multiplied by 100
         #  zscore_vals()$updated$beta_recprob*100, 
         1 # to the nearest tenth,
       ),
@@ -255,37 +255,43 @@ beta_prob <- reactive({
       sep = "") # without any separating space or punctuation
 })
 
-prob_diff <- reactive({
-    str_c( # creating a string that includes: 
-      round( # the rounded product of 
-        zscore_vals()$perc.diff*100, # 
-        #  zscore_vals()$updated$perc.diff*100, 
-        1 # to the nearest tenth,
-      ),
-      "%", # and a percent sign,  
-      sep = "") # without any separating space or punctuation
-})
+# prob_diff <- reactive({
+#     str_c( # creating a string that includes: 
+#       round( # the rounded product of 
+#         zscore_vals()$perc.diff*100, # 
+#         #  zscore_vals()$updated$perc.diff*100, 
+#         1 # to the nearest tenth,
+#       ),
+#       "%", # and a percent sign,  
+#       sep = "") # without any separating space or punctuation
+# })
 
 #  Using the zscore_vals reactive object, create a reactive plot that plots the score and recommended probability
-alpha_plot <- reactive({
+# alpha_plot <- reactive({
 
-  plot_alpha(data = original_zvals(), # helper function for plotting the z-score function
-    # data = zscore_vals()$updated,
-    xcol = zscore, # and values
-    ycol = alpha_recprob, 
-    color = "gray") + 
-    ggplot2::geom_point(data = zscore_vals(), 
-  aes(x = zscore, y = alpha_recprob), color = "#3e9eb6", size = 4) 
-})
+#   plot_alpha(data = original_zvals(), # helper function for plotting the z-score function
+#     # data = zscore_vals()$updated,
+#     xcol = zscore, # and values
+#     ycol = alpha_recprob, 
+#     color = "gray") + 
+#     ggplot2::geom_point(data = zscore_vals(), 
+#   aes(x = zscore, y = alpha_recprob), color = "#3e9eb6", size = 4) 
+# })
 
-ab_plot <- reactive({
-  plot_abprob(data = zscore_vals(), # helper function for plotting the z-score function
-    # data = zscore_vals()$updated,
-    z = zscore, # and values
-    alpha = alpha_recprob, 
-    beta = beta_recprob) #+
-    # labs(subtitle = "This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the\nAlpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy.") + 
-    # theme(plot.subtitle = element_text(size = 14))
+# ab_plot <- reactive({
+#   plot_abprob(data = zscore_vals(), # helper function for plotting the z-score function
+#     # data = zscore_vals()$updated,
+#     z = zscore, # and values
+#     alpha = alpha_recprob, 
+#     beta = beta_recprob) #+
+#     # labs(subtitle = "This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the\nAlpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy.") + 
+#     # theme(plot.subtitle = element_text(size = 14))
+# })
+  
+RecProb_plot <- reactive({
+  plotRecProb(data = zscore_vals(), 
+              z = zscore, 
+              RecProb = RecProb)
 })
 
 ## Outputs ####
@@ -310,36 +316,48 @@ output$zscore <- renderText(
   )
 
 # Print the recommended probability value by
-output$AlphaProb <- renderText(
+# output$AlphaProb <- renderText(
     
-  alpha_prob()
+#   alpha_prob()
 
-)
+# )
 
 # Plot the z-score and recommended probability values
-output$alpha_plot <- renderPlot({
+# output$alpha_plot <- renderPlot({
 
-  alpha_plot()
+#   alpha_plot()
   
-})
+# })
   
-output$ab_plot <- renderPlot({
+# output$ab_plot <- renderPlot({
 
-  ab_plot()
+#   ab_plot()
   
-})
+# })
   
-output$BetaProb <- renderText(
+# output$BetaProb <- renderText(
     
-  beta_prob()
+#   beta_prob()
+
+# )
+  
+output$RecProb_plot <- renderPlot(
+    
+  RecProb_plot()
+
+)
+  
+output$RecProb <- renderText(
+    
+  RecProb()
 
 )
 
-output$PercDiff <- renderText(
+# output$PercDiff <- renderText(
     
-  prob_diff()
+#   prob_diff()
 
-)
+# )
   
 ## Report #### =====================================================================
 # create a temporary file location

@@ -624,6 +624,40 @@
         "RemoteSha": "1.0.12"
       }
     },
+    "bsicons": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "bsicons",
+        "Title": "Easily Work with 'Bootstrap' Icons",
+        "Version": "0.1.2",
+        "Authors@R": "c(\n    person(\"Carson\", \"Sievert\", , \"carson@posit.co\", role = c(\"cre\", \"aut\"),\n           comment = c(ORCID = \"0000-0002-4958-2844\")),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")),\n    person(\"Mark\", \"Otto\", role = \"cph\",\n           comment = \"Bootstrap icons maintainer\")\n  )",
+        "Description": "Easily use 'Bootstrap' icons inside 'Shiny' apps and 'R\n    Markdown' documents. More generally, icons can be inserted in any\n    'htmltools' document through inline 'SVG'.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/rstudio/bsicons",
+        "BugReports": "https://github.com/rstudio/bsicons/issues",
+        "Depends": "R (>= 2.10)",
+        "Imports": "cli, htmltools, rlang, utils",
+        "Suggests": "bslib, processx, testthat, webshot2, withr",
+        "Config/testthat/edition": "3",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-11-03 23:29:00 UTC; cpsievert",
+        "Author": "Carson Sievert [cre, aut] (<https://orcid.org/0000-0002-4958-2844>),\n  Posit Software, PBC [cph, fnd],\n  Mark Otto [cph] (Bootstrap icons maintainer)",
+        "Maintainer": "Carson Sievert <carson@posit.co>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-11-04 00:30:05 UTC",
+        "Built": "R 4.5.3; ; 2026-03-28 19:37:21 UTC; windows",
+        "RemoteType": "standard",
+        "RemoteRef": "bsicons",
+        "RemotePkgRef": "bsicons",
+        "RemoteRepos": "https://cran.rstudio.com",
+        "RemoteReposName": "CRAN",
+        "RemotePkgPlatform": "x86_64-w64-mingw32",
+        "RemoteSha": "0.1.2"
+      }
+    },
     "bslib": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -2858,7 +2892,7 @@
         "Remotes": "NOAA-EDAB/stocksmart",
         "Suggests": "testthat (>= 3.0.0)",
         "Config/testthat/edition": "3",
-        "Depends": "R (>= 4.1.0)",
+        "Depends": "R (>= 3.5)",
         "LazyData": "true",
         "RemoteType": "github",
         "RemoteHost": "api.github.com",
@@ -2866,16 +2900,16 @@
         "RemoteUsername": "MarisCollaborative",
         "RemotePkgRef": "MarisCollaborative/nefishr",
         "RemoteRef": "HEAD",
-        "RemoteSha": "472b444f19714b1e652d4e464d49ea97a035cd72",
+        "RemoteSha": "2b3405046423452ecf188f4e5aea8cadde52c7d1",
         "GithubRepo": "nefishr",
         "GithubUsername": "MarisCollaborative",
         "GithubRef": "HEAD",
-        "GithubSHA1": "472b444f19714b1e652d4e464d49ea97a035cd72",
+        "GithubSHA1": "2b3405046423452ecf188f4e5aea8cadde52c7d1",
         "NeedsCompilation": "no",
-        "Packaged": "2026-02-23 16:43:48 UTC; amiller",
+        "Packaged": "2026-04-28 20:56:40 UTC; amiller",
         "Author": "Angelia Miller [aut, cre]",
         "Maintainer": "Angelia Miller <amiller@nefmc.org>",
-        "Built": "R 4.5.2; ; 2026-02-23 16:43:49 UTC; windows"
+        "Built": "R 4.5.2; ; 2026-05-11 14:18:23 UTC; windows"
       }
     },
     "openssl": {
@@ -4139,7 +4173,7 @@
       "description": {
         "Package": "stocksmart",
         "Title": "Provides access to NOAAs stock SMART data",
-        "Version": "0.7.4",
+        "Version": "1.1.7",
         "Authors@R": "\n    person(given = \"Andy\",family = \"Beet\", role = c(\"aut\", \"cre\"),\n           email = \"andrew.beet@noaa.gov\",\n           comment = c(ORCID = \"0000-0001-8270-7090\"))",
         "Description": "Provides access to data found on the NOAA Stock SMART website. \n    The package serves as a data repository for fisheries assessment \n    information and includes utilities for data retrieval.",
         "URL": "https://github.com/NOAA-EDAB/stocksmart,\nhttps://noaa-edab.github.io/stocksmart/",
@@ -4150,7 +4184,7 @@
         "Roxygen": "list(markdown = TRUE)",
         "RoxygenNote": "7.3.2",
         "Depends": "R (>= 4.2)",
-        "Imports": "dplyr, tidyr, rlang, ggplot2, tibble, jsonlite, httr,\nlifecycle, readxl",
+        "Imports": "dplyr, ggplot2, httr, jsonlite, lifecycle, readxl, rlang,\nstringr, tibble, tidyr",
         "Suggests": "here, knitr, rmarkdown, testthat (>= 3.0.0)",
         "VignetteBuilder": "knitr",
         "Config/testthat/edition": "3",
@@ -4160,16 +4194,16 @@
         "RemoteUsername": "NOAA-EDAB",
         "RemotePkgRef": "NOAA-EDAB/stocksmart",
         "RemoteRef": "HEAD",
-        "RemoteSha": "fb3742fe95db97568246319bd5b331546931d53b",
+        "RemoteSha": "8cfadd3393b91aa29f13fee5d541cfd82e311c9c",
         "GithubRepo": "stocksmart",
         "GithubUsername": "NOAA-EDAB",
         "GithubRef": "HEAD",
-        "GithubSHA1": "fb3742fe95db97568246319bd5b331546931d53b",
+        "GithubSHA1": "8cfadd3393b91aa29f13fee5d541cfd82e311c9c",
         "NeedsCompilation": "no",
-        "Packaged": "2026-02-23 16:43:35 UTC; amiller",
+        "Packaged": "2026-05-11 14:17:58 UTC; amiller",
         "Author": "Andy Beet [aut, cre] (ORCID: <https://orcid.org/0000-0001-8270-7090>)",
         "Maintainer": "Andy Beet <andrew.beet@noaa.gov>",
-        "Built": "R 4.5.2; ; 2026-02-23 16:43:38 UTC; windows"
+        "Built": "R 4.5.2; ; 2026-05-11 14:18:09 UTC; windows"
       }
     },
     "stringi": {
@@ -5075,10 +5109,13 @@
       "checksum": "b0d3edf8c993f873732b3b9154048870"
     },
     ".Rprofile": {
-      "checksum": "f3e8d5713cb735d3cd5507ec658c20ee"
+      "checksum": "271b8b6d48930ff47008706eeb8d5d20"
     },
     "app.R": {
       "checksum": "001b6a6191733cb394d04f23f427edcb"
+    },
+    "data/beta-rp-curve.png": {
+      "checksum": "0df0ea019fcba9eb83ae64f68622492f"
     },
     "data/fmp_vals.rds": {
       "checksum": "151fe9edd428ee67acdc15f3c768a31d"
@@ -5108,16 +5145,31 @@
       "checksum": "c69211394ce8ff291c738862e3269567"
     },
     "helpers.R": {
-      "checksum": "e96566b9d372f1bc706c3822e00ae17d"
+      "checksum": "d19a9f85f1e7355f0053039e3e86ad30"
     },
     "modules.R": {
       "checksum": "57b3bd3387e7e355c0c1ca72e643a9ea"
+    },
+    "outputs/horizontal_infpt_plot.png": {
+      "checksum": "459c82e74cd9aff8629f458d4c735315"
+    },
+    "outputs/horizontal_thirds_plot.png": {
+      "checksum": "8f2f606fb11cb3e0bbcc564e89a8e6f7"
+    },
+    "outputs/vertical_infpt_plot.png": {
+      "checksum": "7284742913cb9c9ecd33316fe2fc1dcf"
+    },
+    "outputs/vertical_thirds_plot.png": {
+      "checksum": "3c1a49b7e55223ced76fea7fbbec585f"
+    },
+    "outputs/vertical_twos_plot.png": {
+      "checksum": "eb069fdabeb26d89ab0285ede4e8fa9a"
     },
     "README.md": {
       "checksum": "73f1c6b3bb448ed30c1d8d06b6fc8226"
     },
     "renv.lock": {
-      "checksum": "48efdda476f3d1bd05e0bf56d821f29b"
+      "checksum": "bede86eb9cf9010952af3ec6ca87f266"
     },
     "rp_report.qmd": {
       "checksum": "0156ffa5e79dd4688c6d698f0c4e75bf"
@@ -5126,7 +5178,7 @@
       "checksum": "3f1055767e6fb37c0a2bab2ee3568106"
     },
     "server.R": {
-      "checksum": "105338d81ce26da9a2056de7c2e9e98f"
+      "checksum": "d974f33c56a18c0a6e1ba4ae37f3707a"
     },
     "shiny_quarto.html": {
       "checksum": "160d561995fcb59c000703509a87e1df"
@@ -5213,10 +5265,10 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "tiered-plot_sandbox.R": {
-      "checksum": "d31b824bae7b4214105d7ff147810b31"
+      "checksum": "cf8f5943fb79d301afae395982986e66"
     },
     "ui.R": {
-      "checksum": "6615519a907647a79c53176c1aacd2ec"
+      "checksum": "2b2aa19c511c4a5ad6c7aa41d1dd8727"
     }
   },
   "users": null

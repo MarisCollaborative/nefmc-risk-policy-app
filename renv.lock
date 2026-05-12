@@ -631,6 +631,40 @@
       "Maintainer": "Emil Hvitfeldt <emil.hvitfeldt@posit.co>",
       "Repository": "CRAN"
     },
+    "bsicons": {
+      "Package": "bsicons",
+      "Version": "0.1.2",
+      "Source": "Repository",
+      "Title": "Easily Work with 'Bootstrap' Icons",
+      "Authors@R": "c( person(\"Carson\", \"Sievert\", , \"carson@posit.co\", role = c(\"cre\", \"aut\"), comment = c(ORCID = \"0000-0002-4958-2844\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")), person(\"Mark\", \"Otto\", role = \"cph\", comment = \"Bootstrap icons maintainer\") )",
+      "Description": "Easily use 'Bootstrap' icons inside 'Shiny' apps and 'R Markdown' documents. More generally, icons can be inserted in any 'htmltools' document through inline 'SVG'.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://github.com/rstudio/bsicons",
+      "BugReports": "https://github.com/rstudio/bsicons/issues",
+      "Depends": [
+        "R (>= 2.10)"
+      ],
+      "Imports": [
+        "cli",
+        "htmltools",
+        "rlang",
+        "utils"
+      ],
+      "Suggests": [
+        "bslib",
+        "processx",
+        "testthat",
+        "webshot2",
+        "withr"
+      ],
+      "Config/testthat/edition": "3",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.2.3",
+      "NeedsCompilation": "no",
+      "Author": "Carson Sievert [cre, aut] (<https://orcid.org/0000-0002-4958-2844>), Posit Software, PBC [cph, fnd], Mark Otto [cph] (Bootstrap icons maintainer)",
+      "Maintainer": "Carson Sievert <carson@posit.co>",
+      "Repository": "CRAN"
+    },
     "bslib": {
       "Package": "bslib",
       "Version": "0.10.0",
@@ -3001,7 +3035,7 @@
       ],
       "Config/testthat/edition": "3",
       "Depends": [
-        "R (>= 4.1.0)"
+        "R (>= 3.5)"
       ],
       "LazyData": "true",
       "RemoteType": "github",
@@ -3010,7 +3044,7 @@
       "RemoteUsername": "MarisCollaborative",
       "RemotePkgRef": "MarisCollaborative/nefishr",
       "RemoteRef": "HEAD",
-      "RemoteSha": "472b444f19714b1e652d4e464d49ea97a035cd72",
+      "RemoteSha": "2b3405046423452ecf188f4e5aea8cadde52c7d1",
       "NeedsCompilation": "no",
       "Author": "Angelia Miller [aut, cre]",
       "Maintainer": "Angelia Miller <amiller@nefmc.org>"
@@ -4428,7 +4462,7 @@
     },
     "stocksmart": {
       "Package": "stocksmart",
-      "Version": "0.7.4",
+      "Version": "1.1.7",
       "Source": "GitHub",
       "Title": "Provides access to NOAAs stock SMART data",
       "Authors@R": "person(given = \"Andy\",family = \"Beet\", role = c(\"aut\", \"cre\"), email = \"andrew.beet@noaa.gov\", comment = c(ORCID = \"0000-0001-8270-7090\"))",
@@ -4445,14 +4479,15 @@
       ],
       "Imports": [
         "dplyr",
-        "tidyr",
-        "rlang",
         "ggplot2",
-        "tibble",
-        "jsonlite",
         "httr",
+        "jsonlite",
         "lifecycle",
-        "readxl"
+        "readxl",
+        "rlang",
+        "stringr",
+        "tibble",
+        "tidyr"
       ],
       "Suggests": [
         "here",
@@ -4468,7 +4503,7 @@
       "RemoteUsername": "NOAA-EDAB",
       "RemotePkgRef": "NOAA-EDAB/stocksmart",
       "RemoteRef": "HEAD",
-      "RemoteSha": "fb3742fe95db97568246319bd5b331546931d53b",
+      "RemoteSha": "8cfadd3393b91aa29f13fee5d541cfd82e311c9c",
       "NeedsCompilation": "no",
       "Author": "Andy Beet [aut, cre] (ORCID: <https://orcid.org/0000-0001-8270-7090>)",
       "Maintainer": "Andy Beet <andrew.beet@noaa.gov>"
