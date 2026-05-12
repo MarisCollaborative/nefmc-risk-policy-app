@@ -27,18 +27,18 @@ normalize_val <- function(x){ x / sum(x) }
 #' 
 calc_zscore <- function(score, weight){ sum({{score}}*{{weight}}) }
 
-### Calculate the recommended probability ####
+### Calculate the recommended probability ###
 #' Logistic function that truncates the curve at ymin = 0.5. 
 #' 
 #' 
-alpha_recprob <- function(z){ 1/(1+exp(-z)) }
+# alpha_recprob <- function(z){ 1/(1+exp(-z)) }
 
-### Updated recommended probability function ####
+### Recommended probability function ####
 #' Logistic function that fits the full curve between 0.5 and 1 y-limits
 #' 
 #' 
 #' 
-beta_recprob <- function(z){ 0.5 + (0.5/(1+exp(z))) }
+calcRecProb <- function(z){ 0.5 + (0.5/(1+exp(z))) }
 
 ### Percent difference ####
 percent.diff <- function(x1, x2) {
@@ -160,45 +160,92 @@ clean_weights <- function(data){
 #' 
 #' 
 #' 
-plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
-    ggplot2::ggplot() + 
-        ggplot2::lims(x = c(0,4), y = c(0.5,1))+
-        ggplot2::geom_function(fun = alpha_recprob, linewidth = 1) + 
-        ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
-        ggplot2::geom_point(data = {{ data }}, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
-        ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Recommended\nProbability" = {{color}} )) +
-        ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
-        ggplot2::theme_bw() +
-        ggplot2::theme(axis.title = element_text(size = rel(1.25)),
-              axis.text = element_text(size = rel(1.25)), 
-              legend.position = "bottom", 
-              legend.title = element_text(size = rel(1.25)),
-              legend.text = element_text(size = rel(1.25)), 
-              legend.key.spacing = unit(0.5, "cm")) + 
-        ggplot2::coord_fixed(ratio = 4)
-}
+# plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
+#     ggplot2::ggplot() + 
+#         ggplot2::lims(x = c(0,4), y = c(0.5,1))+
+#         ggplot2::geom_function(fun = alpha_recprob, linewidth = 1) + 
+#         ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
+#         ggplot2::geom_point(data = {{ data }}, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
+#         ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Recommended\nProbability" = {{color}} )) +
+#         ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
+#         ggplot2::theme_bw() +
+#         ggplot2::theme(axis.title = element_text(size = rel(1.25)),
+#               axis.text = element_text(size = rel(1.25)), 
+#               legend.position = "bottom", 
+#               legend.title = element_text(size = rel(1.25)),
+#               legend.text = element_text(size = rel(1.25)), 
+#               legend.key.spacing = unit(0.5, "cm")) + 
+#         ggplot2::coord_fixed(ratio = 4)
+# }
 
 
 ### Plot Alpha and Beta functions ####
 #' Plots alpha and beta functions on the same pane to show differences in z-scores between approaches
 #' 
 #' 
-plot_abprob <- function(data, z, alpha, beta){
-    ggplot2::ggplot() + 
-        ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
-        ggplot2::geom_function(fun = alpha_recprob, linewidth = 1, lty = 2) + 
-        ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{alpha}}, color = "Alpha\nRecommended\nProbability"), size = 4) +
-        ggplot2::geom_function(fun = beta_recprob, linewidth = 1, lty = 3) + 
-        ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
-        ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{beta}}, color = "Beta\nRecommended\nProbability"), size = 4) +
-        ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Alpha\nRecommended\nProbability" = "#3e9eb6", "Beta\nRecommended\nProbability" = "red")) +
-        ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
-        ggplot2::theme_bw() +
-        ggplot2::theme(axis.title = element_text(size = rel(1.25)),
-              axis.text = element_text(size = rel(1.25)), 
-              legend.position = "bottom", 
-              legend.title = element_text(size = rel(1.25)),
-              legend.text = element_text(size = rel(1.25)), 
-              legend.key.spacing = unit(0.5, "cm")) + 
-        ggplot2::coord_fixed(ratio = 8)
+# plot_abprob <- function(data, z, alpha = NULL, beta){
+#     ggplot2::ggplot() + 
+#         ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
+#         # ggplot2::geom_function(fun = alpha_recprob, linewidth = 1, lty = 2) + 
+#         # ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{alpha}}, color = "Alpha\nRecommended\nProbability"), size = 4) +
+#         ggplot2::geom_function(fun = beta_recprob, linewidth = 1, lty = 3) + 
+#         ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
+#         ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{beta}}, color = "Beta\nRecommended\nProbability"), size = 4) +
+#         ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Alpha\nRecommended\nProbability" = "#3e9eb6", "Beta\nRecommended\nProbability" = "red")) +
+#         ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
+#         ggplot2::theme_bw() +
+#         ggplot2::theme(axis.title = element_text(size = rel(1.25)),
+#               axis.text = element_text(size = rel(1.25)), 
+#               legend.position = "bottom", 
+#               legend.title = element_text(size = rel(1.25)),
+#               legend.text = element_text(size = rel(1.25)), 
+#               legend.key.spacing = unit(0.5, "cm")) + 
+#         ggplot2::coord_fixed(ratio = 8)
+# }
+
+### Plot the Recommended Probability ####
+#' Plots the logistic function 
+#' 
+#'
+plotRecProb <- function(data, z, RecProb){
+  
+  horizon_zones <- c("High Risk\nTolerance", "Intermediate Risk\nTolerance", "Low Risk\nTolerance")
+  
+  # zones created horizontally at the inflection points 
+  horizontal_inf_pts <- data.frame(
+   x = c(-4, -4, -4),
+   ymin = c(0.5, 0.61, 0.89),
+   ymax = c(0.61, 0.89, 1.00),
+   Zones = factor(horizon_zones, levels = horizon_zones),
+   w = c(8, 8, 8)
+  )
+  
+  ggplot2::ggplot() +
+    ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
+    geom_rect(data = horizontal_inf_pts, aes(xmin = x, xmax = x + w, ymin = ymin, ymax = ymax, fill = Zones), alpha = 0.35) +
+    ggplot2::geom_function(fun = calcRecProb, linewidth = 1, lty = 3) + 
+    ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
+    ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{RecProb}}, color = "Recommended\nProbability"), size = 4) +
+    ggplot2::scale_color_manual(name = "Legend",
+      values = c("MSA 50%\nprobability limit" = "red", 
+                 "Recommended\nProbability" = "#1d365e")
+    ) +
+    ggplot2::scale_fill_manual(
+      values = c("Low Risk\nTolerance" = "#CC3300", 
+                 "Intermediate Risk\nTolerance" = "#FF9900", 
+                 "High Risk\nTolerance" = "#33CC33")
+    ) +
+    ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
+    ggplot2::theme_bw() +
+    ggplot2::theme(axis.title = element_text(size = rel(1)),
+        axis.text = element_text(size = rel(1)), 
+        legend.position = "bottom", 
+        legend.title = element_text(size = rel(1)),
+        legend.text = element_text(size = rel(1)), 
+        legend.key.spacing = unit(0.5, "cm")) + 
+    guides(
+    color = guide_legend(order = 1), # Hline
+    fill = guide_legend(order = 2)   # Rect
+    ) +
+    ggplot2::coord_fixed(ratio = 8)
 }
