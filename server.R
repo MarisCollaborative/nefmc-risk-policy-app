@@ -44,6 +44,7 @@ observeEvent(input$fmp, {
 # create reactive element for selected stock
 stock <- reactive(input$stock)
 
+# only allow the "Generate report button" to be active if a stock has been selected.
 observe({
   if (req(input$stock) != "Select a stock...") {
     enable("report")
@@ -254,6 +255,16 @@ RecProb <- reactive({
       "%", # and a percent sign,  
       sep = "") # without any separating space or punctuation
 })
+  
+ZoneArea <- reactive({
+  if(zscore_vals()$RecProb <= 0.61){ # if the recommended probability value is less than or equal to 0.61
+    paste0("High Risk Tolerance") # then this falls into the High Risk Tolerance Zone
+  } else if(zscore_vals()$RecProb >= 0.89){ # if the recommended probability value is greater than or equal to 0.89
+    paste0("Low Risk Tolerance") # then this falls into the Low Risk Tolerance Zone
+  } else {
+    paste0("Intermediate Risk Tolerance") # otherwise, all other values are within the Intermediate Risk Tolerance Zone
+  }
+})
 
 # prob_diff <- reactive({
 #     str_c( # creating a string that includes: 
@@ -291,7 +302,8 @@ RecProb <- reactive({
 RecProb_plot <- reactive({
   plotRecProb(data = zscore_vals(), 
               z = zscore, 
-              RecProb = RecProb)
+              RecProb = RecProb, 
+              size = 3)
 })
 
 ## Outputs ####
@@ -341,9 +353,16 @@ output$zscore <- renderText(
 
 # )
   
-output$RecProb_plot <- renderPlot(
+output$plot <- renderPlot(
     
-  RecProb_plot()
+  RecProb_plot() + 
+    ggplot2::theme(
+      legend.position = "right",
+      axis.title = element_text(size = rel(1)),
+      axis.text = element_text(size = rel(1)),
+      legend.text = element_text(size = rel(1))
+    ) +
+    ggplot2::coord_fixed(ratio = 8)
 
 )
   
@@ -352,6 +371,11 @@ output$RecProb <- renderText(
   RecProb()
 
 )
+  
+output$ClassifyZone <- renderText(
+  ZoneArea()
+)
+
 
 # output$PercDiff <- renderText(
     
@@ -389,9 +413,11 @@ output$report <- downloadHandler(
                    matrix_tbl = matrix_tbl(),
                    scores = final_scores(), 
                    zscore = zscore(), 
-                   RecProb = alpha_prob(), 
-                   zplot = alpha_plot(), 
-                   rationale = rationale()
+                   RecProb = RecProb(), 
+                   plot_data = zscore_vals(),
+                  #  plot = RecProb_plot(), 
+                   zone = ZoneArea()
+                  #  rationale = rationale()
                   )
     # debug params
     print("Parameters for RMD render:")
