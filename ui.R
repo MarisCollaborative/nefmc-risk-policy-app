@@ -111,22 +111,22 @@ ui <- fluidPage(
                                   ),
                         ### Tab 2: a plot of the calculated Z-score and recommended probability based on the scores and weights =======
                         nav_panel("Z-score Plot",
-                                  plotOutput("RecProb_plot"), 
+                                  plotOutput("plot"), 
                                   # p("This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the Alpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy."),
                                   p(strong("The recommended probability based on the logisitic curve and the Z-score:")),
-                                  verbatimTextOutput('RecProb', placeholder = T)#,
-                                  # p(strong("The percent difference between recommended probabilities based on the two logistic curves:")),
-                                  # verbatimTextOutput('PercDiff', placeholder = T))
-                                        )
+                                  verbatimTextOutput('RecProb', placeholder = T),
+                                  p(strong("The level of risk tolerance to consider based on the risk zones:")),
+                                  verbatimTextOutput('ClassifyZone', placeholder = T))
+                                        ),
                                       ),
                   # and a text area for user input if there is a decision to change a score(s) and ultimately the recommended probability for a given stock in a given year =====================================================================================
-                  card(textAreaInput(inputId = "rationale", 
-                                     label = "If you are recommending a change to a score, enter your rationale below.", 
-                                     width = '100%')#, 
-                                     #value = "No changes or additional rationale provided.")
-                      )
+            #       card(textAreaInput(inputId = "rationale", 
+            #                          label = "If you are recommending a change to a score, enter your rationale below.", 
+            #                          width = '100%')#, 
+            #                          #value = "No changes or additional rationale provided.")
+            #           )
                 
-            ), 
+            # ), 
             ## Page 3 - About the application and how to use it ========================================================================
             nav_panel(title = "About",
               h5(strong("About the Application")), 

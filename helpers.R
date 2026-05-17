@@ -120,7 +120,7 @@ clean_matrix <- function(data){
 clean_scores <- function(data){
 
   scores <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "assessment")) |>  
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "assessment", ends_with("rationale"), ends_with("src"), ends_with("source"), "climate.score.level")) |>  
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "score") |> 
@@ -207,7 +207,7 @@ clean_weights <- function(data){
 #' Plots the logistic function 
 #' 
 #'
-plotRecProb <- function(data, z, RecProb){
+plotRecProb <- function(data, z, RecProb, size = 1.5){
   
   horizon_zones <- c("High Risk\nTolerance", "Intermediate Risk\nTolerance", "Low Risk\nTolerance")
   
@@ -225,7 +225,7 @@ plotRecProb <- function(data, z, RecProb){
     geom_rect(data = horizontal_inf_pts, aes(xmin = x, xmax = x + w, ymin = ymin, ymax = ymax, fill = Zones), alpha = 0.35) +
     ggplot2::geom_function(fun = calcRecProb, linewidth = 1, lty = 3) + 
     ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
-    ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{RecProb}}, color = "Recommended\nProbability"), size = 4) +
+    ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{RecProb}}, color = "Recommended\nProbability"), size =  size) +
     ggplot2::scale_color_manual(name = "Legend",
       values = c("MSA 50%\nprobability limit" = "red", 
                  "Recommended\nProbability" = "#1d365e")
@@ -237,15 +237,24 @@ plotRecProb <- function(data, z, RecProb){
     ) +
     ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
     ggplot2::theme_bw() +
-    ggplot2::theme(axis.title = element_text(size = rel(1)),
-        axis.text = element_text(size = rel(1)), 
-        legend.position = "bottom", 
-        legend.title = element_text(size = rel(1)),
-        legend.text = element_text(size = rel(1)), 
-        legend.key.spacing = unit(0.5, "cm")) + 
     guides(
-    color = guide_legend(order = 1), # Hline
-    fill = guide_legend(order = 2)   # Rect
+    color = guide_legend(order = 1, 
+      override.aes = list(size = 2.5),
+      theme = theme(#legend.justification = "left", 
+      legend.title = element_text(face = "bold"))), # Hline
+    fill = guide_legend(order = 2, 
+      theme = theme(#legend.justification = "left", 
+      legend.title = element_text(face = "italic", size = 8.5), 
+      legend.margin = margin(0,0,0,0)))   # Rect
     ) +
-    ggplot2::coord_fixed(ratio = 8)
+    ggplot2::theme( 
+        legend.position = "bottom", 
+        legend.justification = "left", 
+        legend.box = "vertical",
+        legend.box.just = "left", 
+        # legend.title = element_text(face = "italic"),
+        legend.title.position = "top", 
+        legend.byrow = TRUE,
+        # legend.spacing = unit(0.75, "inches"), 
+        legend.key.spacing = unit(0.5, "cm")) 
 }
