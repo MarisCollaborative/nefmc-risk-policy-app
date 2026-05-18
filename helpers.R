@@ -18,7 +18,7 @@ scale_val <- function(x, y = 4){ x / {{y}} }
 #' 
 #' 
 #' 
-normalize_val <- function(x){ x / sum(x) }
+# normalize_val <- function(x){ x / sum(x) }
 
 
 ### Calculate a Z-score ####
@@ -139,7 +139,7 @@ clean_weights <- function(data){
 
   weights <- data |> 
     dplyr::relocate(report_year, .before = dplyr::everything()) |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "weight_year", "weightings")) |>  
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "weight_year", "weightings", "weightings_assessment", "form_id")) |>  
     tidyr::pivot_longer(cols = 2:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "weight") |> 
@@ -149,8 +149,13 @@ clean_weights <- function(data){
     dplyr::summarise(avg_weight = round(
                                         mean(weight, na.rm = T), 
                                         2),
-                    .by = c(report_year, factor)) |>
-    dplyr::mutate(normalized_weight = round(normalize_val(avg_weight), 2)) 
+                    .by = c(report_year, factor)) #|>
+    #dplyr::mutate(normalized_weight = round(normalize_val(avg_weight), 2)) 
+  
+    sum_wt <- sum(weights$avg_weight)
+  
+    weights <- weights |> 
+      mutate(normalized_weight = round(avg_weight / sum_wt, 2))
 
   return(weights)
 }
