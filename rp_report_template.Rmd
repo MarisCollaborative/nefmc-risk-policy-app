@@ -8,10 +8,12 @@ params: # NA because they will be replaced by the shiny app parameters
     fmp: NA 
     matrix_tbl: NA
     scores: NA
+    plot_data: NA
     zscore: NA
     RecProb: NA
-    zplot: NA
-    rationale: NA
+    # plot: NA
+    zone: NA
+    # rationale: NA
 ---
 ```{r setup, include=FALSE}
 # set echo in all code chunks so they are not included in the output file
@@ -20,6 +22,8 @@ library(gt)
 library(tidyverse)
 # library(flextable)
 library(kableExtra)
+library(here)
+source(here("helpers.R"))
 ```
 
 
@@ -69,14 +73,16 @@ The recommended probability is **`r params$RecProb`**\
 
 
 
-## Recommended Probability Plot
-
-```{r zplot}
-params$zplot
+## Recommended Probability
+The level of risk that should be considered based on the z-score and recommended probability for `r params$stock` is _`r params$zone`._\
+\
+\
+```{r zplot, fig.height = 5.5}
+plotRecProb(data = params$plot_data, 
+              z = zscore, 
+              RecProb = RecProb, 
+              size = 2.5) + 
+    ggplot2::theme(legend.text = element_text(size = 8))
 ```
 
-
-## SSC Rationale 
-
-`r if (params$rationale != ""){params$rationale} else {"No changes or additional rationale was provided."}`
 
