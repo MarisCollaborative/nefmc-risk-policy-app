@@ -65,9 +65,7 @@ weights <- sd_get_data(db, table = "rp-weights") |>
   
 # a static object containing results from the scoring survey
 scores <- sd_get_data(db, table = "rp_scores") |> 
-    clean_scores() |> # uses helper function to tidy the data and columns 
-    filter(!factor %in% str_subset(factor, "rationale")) # removes observations containing rationale for a given score
-
+    clean_scores() # uses helper function to tidy the data and columns 
   
 # create a static data frame containing the scores and weights for each factor
 z_data <- left_join(scores, weights, by = c("report_year", "factor"))
@@ -186,21 +184,7 @@ zscore_vals <- reactive({
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
     summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
-              # alpha_recprob = alpha_recprob(zscore), 
-              RecProb = calcRecProb(zscore))#,  # calculate the recommended probability using the logistic function
-              # perc.diff = percent.diff(alpha_recprob, beta_recprob)) #|> # the recommended probablity using a helper function
-    # mutate(alpha_recprob = case_when(
-    #   alpha_recprob < 0.5 ~ 0.5, 
-    #   TRUE ~ alpha_recprob)
-    # )
-  # map(zdata_rv, 
-  #   ~filter(., report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
-  #   summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
-  #             alpha_recprob = alpha_recprob(zscore), 
-  #             beta_recprob = beta_recprob(zscore), 
-  #             perc.diff = percent.diff(alpha_recprob, beta_recprob), # the recommended probablity using a helper function
-  #             .by = c("report_year", "stock"))
-  # )
+              RecProb = calcRecProb(zscore))  # calculate the recommended probability using the logistic function
 
 })
 

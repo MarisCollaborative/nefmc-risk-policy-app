@@ -14,7 +14,7 @@ library(bsicons)
 db <- sd_db_connect(".env")
 
 # fetch the risk policy scores from the database 
-data <- sd_get_data(db, "rp-scores")
+data <- sd_get_data(db, "rp_scores")
 
 # identify the unique values of report year that occur in the table
 year_vals <- unique(data$report_year) |> sort()
