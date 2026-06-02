@@ -120,7 +120,7 @@ clean_matrix <- function(data){
 clean_scores <- function(data){
 
   scores <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", ends_with("rationale"), ends_with("source"), "climate_score_level", ends_with("rationale"), ends_with("src"), ends_with("source"), "climate.score.level")) |>  
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", ends_with("rationale"), ends_with("source"), "climate_score_level")) |>  
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "score") |> 

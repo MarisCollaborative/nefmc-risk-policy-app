@@ -391,7 +391,7 @@ report_path <- tempfile(fileext = ".qmd")
 file.copy("rp_report_template.Rmd", report_path, overwrite = TRUE)
   
 report_name <- reactive({
-  stringr::str_replace(stock(), pattern = "[:space:]", replace = "_") |> 
+  stringr::str_replace_all(stock(), pattern = "[:space:]", replace = "_") |> 
   stringr::str_c("_rp-report_", year(), ".pdf", sep = "")
 })
 
