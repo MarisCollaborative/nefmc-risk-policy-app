@@ -63,7 +63,7 @@ weights <- sd_get_data(db, table = "rp-weights") |>
 
   
 # a static object containing results from the scoring survey
-scores <- sd_get_data(db, table = "rp-scores") |> 
+scores <- sd_get_data(db, table = "rp_scores") |> 
     clean_scores() |> # uses helper function to tidy the data and columns 
     filter(!factor %in% str_subset(factor, "rationale")) # removes observations containing rationale for a given score
 
