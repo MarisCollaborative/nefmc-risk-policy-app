@@ -5109,7 +5109,7 @@
       "checksum": "d471b411a80248cd5c656f4bf7c6a5b1"
     },
     ".Rprofile": {
-      "checksum": "1cee4586401d4f71e9d317e8d8bf92a0"
+      "checksum": "37e496cd38c0c4e044a1b512cdabffc8"
     },
     "app.R": {
       "checksum": "001b6a6191733cb394d04f23f427edcb"
@@ -5145,7 +5145,7 @@
       "checksum": "1c510bec798e6e64df217e7a4466c041"
     },
     "helpers.R": {
-      "checksum": "66495ba9b371af58a65dbaa0515d5baf"
+      "checksum": "b0d037cdf91b7ae2cce92f5a94dea2bc"
     },
     "modules.R": {
       "checksum": "57b3bd3387e7e355c0c1ca72e643a9ea"
@@ -5155,6 +5155,9 @@
     },
     "outputs/horizontal_thirds_plot.png": {
       "checksum": "8f2f606fb11cb3e0bbcc564e89a8e6f7"
+    },
+    "outputs/rec-factor-score-compare.png": {
+      "checksum": "caf0a28dbd76b784d1aca905a3c1d92d"
     },
     "outputs/vertical_infpt_plot.png": {
       "checksum": "7284742913cb9c9ecd33316fe2fc1dcf"
@@ -5175,10 +5178,163 @@
       "checksum": "44df76097d9026036f80ec4bfef8482a"
     },
     "rp_report_template.Rmd": {
-      "checksum": "7176bb8292d19d82e0149a121868db8d"
+      "checksum": "1d89b1bee6f28d7e000b5f9c77ad5c91"
+    },
+    "sandbox/rec-factor-score-tests.html": {
+      "checksum": "a09ac7de74837462f8cec10e9a60005d"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-compare-rel-diff-1.png": {
+      "checksum": "96c5e3ccbb6a23c8a0c5bcf0148b385b"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-control-1.png": {
+      "checksum": "7585af6ce5b4fa60e0586b6463a92c3c"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-scenario-a-1.png": {
+      "checksum": "4bbf0a33ad3d8f165d45588518e67f43"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-scenario-b-1.png": {
+      "checksum": "4bbf0a33ad3d8f165d45588518e67f43"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-scenario-c-1.png": {
+      "checksum": "38dc492ef7f9fe11d14ac553ba237715"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-scenario-d-1.png": {
+      "checksum": "caa8363a2d9c49df05384097926c4d2a"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-html/fig-sim-dist-plot-1.png": {
+      "checksum": "3379f5336ac9096f07829644d23b3861"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-pdf/fig-scenario-a-1.pdf": {
+      "checksum": "a3632870ba3cf28300acb6c9d6f3e959"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-pdf/fig-scenario-b-1.pdf": {
+      "checksum": "a3632870ba3cf28300acb6c9d6f3e959"
+    },
+    "sandbox/rec-factor-score-tests_files/figure-pdf/fig-scenario-c-1.pdf": {
+      "checksum": "75ddf4dcdad584680cc6162fe0ee4103"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css": {
+      "checksum": "9e3ffae467580fdb927a41352e75a2e0"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "886da841d7421705f715f600c5ff11bb"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/axe/axe-check.js": {
+      "checksum": "b4f6a44157bfe20b68b69aabf2f8125d"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/popper.min.js": {
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css": {
+      "checksum": "dc55a5b9e770e841cd82e46aadbfb9b0"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/quarto.js": {
+      "checksum": "a65a7780c10232b6515cdfb8beaaa221"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "sandbox/rec-factor-score-tests_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "sandbox/rec-factor-score-tests_full.qmd": {
+      "checksum": "95f2c59716c57a18b3a3eba6e76bb2a4"
+    },
+    "sandbox/rec-factor-score-tests_full_writeup.pdf": {
+      "checksum": "ef7421fdb3dffd42da15b498dc0a5377"
+    },
+    "sandbox/rec-factor-score-tests_JunCouncil.pdf": {
+      "checksum": "175a561f6799da1af5ec07a52f72d8a7"
+    },
+    "sandbox/rec-factor-score-tests_JunCouncil.qmd": {
+      "checksum": "3586dc7ff130a14a75d789b378bf28ef"
+    },
+    "sandbox/rec_factor_score_tests.zip": {
+      "checksum": "e7e5d7556f8928b2011ceac32032d7ba"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests.html": {
+      "checksum": "a09ac7de74837462f8cec10e9a60005d"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-compare-rel-diff-1.png": {
+      "checksum": "96c5e3ccbb6a23c8a0c5bcf0148b385b"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-control-1.png": {
+      "checksum": "7585af6ce5b4fa60e0586b6463a92c3c"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-scenario-a-1.png": {
+      "checksum": "4bbf0a33ad3d8f165d45588518e67f43"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-scenario-b-1.png": {
+      "checksum": "4bbf0a33ad3d8f165d45588518e67f43"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-scenario-c-1.png": {
+      "checksum": "38dc492ef7f9fe11d14ac553ba237715"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-scenario-d-1.png": {
+      "checksum": "caa8363a2d9c49df05384097926c4d2a"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/figure-html/fig-sim-dist-plot-1.png": {
+      "checksum": "3379f5336ac9096f07829644d23b3861"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css": {
+      "checksum": "9e3ffae467580fdb927a41352e75a2e0"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/bootstrap/bootstrap-icons.css": {
+      "checksum": "886da841d7421705f715f600c5ff11bb"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/bootstrap/bootstrap-icons.woff": {
+      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/bootstrap/bootstrap.min.js": {
+      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/clipboard/clipboard.min.js": {
+      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/anchor.min.js": {
+      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/axe/axe-check.js": {
+      "checksum": "b4f6a44157bfe20b68b69aabf2f8125d"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/popper.min.js": {
+      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css": {
+      "checksum": "dc55a5b9e770e841cd82e46aadbfb9b0"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/quarto.js": {
+      "checksum": "a65a7780c10232b6515cdfb8beaaa221"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/tabsets/tabsets.js": {
+      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/tippy.css": {
+      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
+    },
+    "sandbox/rec_factor_score_tests/rec-factor-score-tests_files/libs/quarto-html/tippy.umd.min.js": {
+      "checksum": "d828775275749701b48bd9d958814111"
+    },
+    "sandbox/weights.rds": {
+      "checksum": "70dbf3a6efd0eef920b75d67d5f5ac4b"
     },
     "server.R": {
-      "checksum": "b02487e241013284de62cb1df4c9d90d"
+      "checksum": "01ebd491a21931caeed7195e5d7deb3f"
     },
     "shiny_quarto.html": {
       "checksum": "7606fc1cb33ff84a83fdc46b284722ce"

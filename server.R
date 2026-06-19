@@ -169,7 +169,8 @@ output$matrix <- render_gt({
 original_zvals <- reactive({
   zdata_rv$original |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
-    summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
+    mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
+    summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
               # alpha_recprob = alpha_recprob(zscore), 
               RecProb= calcRecProb(zscore))#,  # calculate the recommended probability using the logistic function
     #           perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> 
@@ -183,7 +184,8 @@ original_zvals <- reactive({
 zscore_vals <- reactive({
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
-    summarise(zscore = calc_zscore(scaled_score, normalized_weight), # calculate the zscore using a helper function, and
+    mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
+    summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
               RecProb = calcRecProb(zscore))  # calculate the recommended probability using the logistic function
 
 })
@@ -192,6 +194,7 @@ zscore_vals <- reactive({
 final_scores <- reactive({ 
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock
+    mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
     select(!c(scaled_score, normalized_weight)) |> 
     gt() |> 
     text_transform(str_to_title, locations = cells_body(columns = factor)) |> 
@@ -240,7 +243,7 @@ RecProb <- reactive({
       sep = "") # without any separating space or punctuation
 })
   
-ZoneArea <- reactive({
+TierArea <- reactive({
   if(zscore_vals()$RecProb <= 0.61){ # if the recommended probability value is less than or equal to 0.61
     paste0("High Risk Tolerance") # then this falls into the High Risk Tolerance Zone
   } else if(zscore_vals()$RecProb >= 0.89){ # if the recommended probability value is greater than or equal to 0.89
@@ -357,7 +360,7 @@ output$RecProb <- renderText(
 )
   
 output$ClassifyZone <- renderText(
-  ZoneArea()
+  TierArea()
 )
 
 
@@ -400,7 +403,7 @@ output$report <- downloadHandler(
                    RecProb = RecProb(), 
                    plot_data = zscore_vals(),
                   #  plot = RecProb_plot(), 
-                   zone = ZoneArea()
+                   tier = TierArea()
                   #  rationale = rationale()
                   )
     # debug params

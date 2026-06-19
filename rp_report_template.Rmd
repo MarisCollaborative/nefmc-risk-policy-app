@@ -12,7 +12,7 @@ params: # NA because they will be replaced by the shiny app parameters
     zscore: NA
     RecProb: NA
     # plot: NA
-    zone: NA
+    tier: NA
     # rationale: NA
 ---
 ```{r setup, include=FALSE}
@@ -74,7 +74,7 @@ The recommended probability is **`r params$RecProb`**\
 
 
 ## Recommended Probability
-The level of risk that should be considered based on the z-score and recommended probability for `r params$stock` is _`r params$zone`._\
+The level of risk that should be considered based on the z-score and recommended probability for `r params$stock` is _`r params$tier`._\
 \
 \
 ```{r zplot, fig.height = 5.5}

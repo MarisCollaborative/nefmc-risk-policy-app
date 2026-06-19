@@ -18,7 +18,7 @@ scale_val <- function(x, y = 4){ x / {{y}} }
 #' 
 #' 
 #' 
-# normalize_val <- function(x){ x / sum(x) }
+normalize_val <- function(x){ x / sum(x) }
 
 
 ### Calculate a Z-score ####
@@ -150,12 +150,12 @@ clean_weights <- function(data){
                                         mean(weight, na.rm = T), 
                                         2),
                     .by = c(report_year, factor)) #|>
-    #dplyr::mutate(normalized_weight = round(normalize_val(avg_weight), 2)) 
+    # dplyr::mutate(normalized_weight = round(normalize_val(avg_weight), 2)) 
   
-    sum_wt <- sum(weights$avg_weight)
+    # sum_wt <- sum(weights$avg_weight)
   
-    weights <- weights |> 
-      mutate(normalized_weight = round(avg_weight / sum_wt, 2))
+    # weights <- weights |> 
+      # mutate(normalized_weight = round(avg_weight / sum_wt, 2))
 
   return(weights)
 }
@@ -214,20 +214,20 @@ clean_weights <- function(data){
 #'
 plotRecProb <- function(data, z, RecProb, size = 1.5){
   
-  horizon_zones <- c("High Risk\nTolerance", "Intermediate Risk\nTolerance", "Low Risk\nTolerance")
+  horizon_tiers <- c("High Risk\nTolerance", "Intermediate Risk\nTolerance", "Low Risk\nTolerance")
   
   # zones created horizontally at the inflection points 
   horizontal_inf_pts <- data.frame(
    x = c(-4, -4, -4),
    ymin = c(0.5, 0.61, 0.89),
    ymax = c(0.61, 0.89, 1.00),
-   Zones = factor(horizon_zones, levels = horizon_zones),
+   Tiers = factor(horizon_tiers, levels = horizon_tiers),
    w = c(8, 8, 8)
   )
   
   ggplot2::ggplot() +
     ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
-    geom_rect(data = horizontal_inf_pts, aes(xmin = x, xmax = x + w, ymin = ymin, ymax = ymax, fill = Zones), alpha = 0.35) +
+    geom_rect(data = horizontal_inf_pts, aes(xmin = x, xmax = x + w, ymin = ymin, ymax = ymax, fill = Tiers), alpha = 0.35) +
     ggplot2::geom_function(fun = calcRecProb, linewidth = 1, lty = 3) + 
     ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
     ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{RecProb}}, color = "Recommended\nProbability"), size =  size) +
