@@ -10,7 +10,7 @@ library(nefishr)
 #' 
 #' 
 #' 
-scale_val <- function(x, y = 4){ x / {{y}} }
+# scale_val <- function(x, y = 4){ x / {{y}} }
 
 
 ### Normalize a value ####
@@ -41,9 +41,9 @@ calc_zscore <- function(score, weight){ sum({{score}}*{{weight}}) }
 calcRecProb <- function(z){ 0.5 + (0.5/(1+exp(z))) }
 
 ### Percent difference ####
-percent.diff <- function(x1, x2) {
-  (x2 - x1) / abs(x1)
-}
+# percent.diff <- function(x1, x2) {
+#   (x2 - x1) / abs(x1)
+# }
 
 ### Render Report function #####
 #'
@@ -124,8 +124,9 @@ clean_scores <- function(data){
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "score") |> 
-    dplyr::mutate(score = as.integer(score),
-           scaled_score = scale_val(score))
+    tidyr::drop_na(any_of(c("report_year", "stock", "score"))) |>
+    dplyr::mutate(score = as.integer(score)) #,
+          #  scaled_score = scale_val(score))
   
   return(scores)
   
