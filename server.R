@@ -195,7 +195,7 @@ final_scores <- reactive({
   zdata_rv$updated |> 
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
-    select(!c(scaled_score, normalized_weight)) |> 
+    select(!c(normalized_weight)) |> 
     gt() |> 
     text_transform(str_to_title, locations = cells_body(columns = factor)) |> 
     cols_label(
