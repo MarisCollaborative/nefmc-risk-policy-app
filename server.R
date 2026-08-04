@@ -55,7 +55,7 @@ observe({
 ## get risk policy data from the database
 # a reactive object containing results from the matrix survey
 info <- sd_get_data(db,
-                      table = "rp-matrix-tbl",
+                      table = "rp_matrix_tbl",
                       refresh_interval = 30) 
 
 # a static object containing results from the weightings survey

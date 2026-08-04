@@ -68,21 +68,24 @@ render_report <- function(input, output, params) {
 clean_matrix <- function(data){
 
   matrix <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page")) |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "name")) |> 
     tidyr::drop_na(report_year) |> 
-    dplyr::mutate(across(3:dplyr::last_col(), ~as.character(.))) |>
+    # dplyr::mutate(across(3:dplyr::last_col(), ~as.character(.))) |>
     dplyr::relocate("terminal_assessment_year", .after = "assessment_model") |>  
-    dplyr::relocate("signif_catch_present", .before = "signif_catch_information") |> 
+    # dplyr::relocate("signif_catch_present", .before = "signif_catch_information") |> 
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "value", 
                         values_to = "answer") |> 
     dplyr::mutate(factor = case_when(
             value %in% c("overfished", "overfishing", "rebuilding_plan", "rebuilding_target", "ssb", "relative_ssb") ~ "Biomass",
-            value %in% c("recruit_incl", "recruitment_model", "beg_recruit_yr", "other_recruit_info", "recruit_year_est_1", "recruit_year_est_2", "recruit_year_est_3", "recruit_est_1", "recruit_est_2", "recruit_est_3") ~ "Recruitment",
-            value %in% c("climate_vulnerability", "climate_direction", "no_of_prey", "prey_information") ~ "Climate Vulnerability",
+            value %in% c("recruit_incl", "recruitment_model", "beg_recruit_yr", "other_recruit_info", "recruit_ests") ~ "Recruitment",
+            value %in% c("climate_vulnerability", "climate_direction") ~ "Climate Vulnerability",
+            value %in% c("no_of_prey", "prey_information") ~ "Fish Condition",
             value %in% c("assessment_type", "assessment_model", "retro_pattern", "retro_val", "data_used", "missing_data", "uncertainty_sources", "terminal_assessment_year") ~ "Assessment and Uncertainty",
-            value %in% c("other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
-            value %in% c("OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
+            value %in% c("commercial_revenue", "commercial_catch", "commercial_dealers", "commercial_mgmt", "commercial_vessels", "commercial_dealers", "commercial_ports", "other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
+            value %in% c("rec_fishery", "recreational_catch", "recreational_trips", "recreational_mgmt", "recreational_ports") ~ "Recreational Fishery Characterization", 
+            value == "other_econ_info" ~ "Other Socioeconomic Information",
+            value %in% c("fmsy_ref_pt", "ssb_ref_pt", "msy_ref_pt", "OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
             TRUE ~ value
           )) |>
     dplyr::relocate("factor", .after = "stock") |> 
@@ -92,18 +95,31 @@ clean_matrix <- function(data){
                         value == "ssb" ~ "SSB",
                         value == "relative_ssb" ~ "Relative SSB",
                         value == "recruit_incl" ~ "Recruitment is estimated", 
+                        value == "recruit_ests" ~ "Recruitment estimates", 
+                        value == "other_recruit_info" ~ "Other Recruitment Information",
                         value == "beg_recruit_yr" ~ "Initial year of time series",
                         value == "retro_pattern" ~ "Retrospective Pattern", 
                         value == "retro_val" ~ "Retrospective Values",
+                        value == "commercial_mgmt" ~ "Commercial Management Uncertainty Buffer", 
+                        value == "rec_fishery" ~ "Recreational Fishery", 
+                        value == "recreational_mgmt" ~ "Recreational Management Uncertainty Buffer", 
+                        value == "other_econ_info" ~ "Other Socioeconomic Information", 
                         value == "signif_catch_present" ~ "Significant Catch Present", 
                         value == "signif_catch_information" ~ "Significant Catch Information",
+                        value == "fmsy_ref_pt" ~ "FMSY Reference Point", 
+                        value == "ssb_ref_pt" ~ "SSB MSY Reference Point",
+                        value == "msy_ref_pt" ~ "MSY Reference Point",
                         value %in% stringr::str_subset(value, "[:lower:]") ~ stringr::str_to_title(stringr::str_replace_all(value, "_", " ")),
                         TRUE ~ str_replace_all(value, "_", " ")),
-                  answer = str_replace_all(answer, "_", " "))
+                  answer = str_replace_all(answer, "_", " "), 
+                answer = case_when(
+                  is.na(answer) ~ paste("Not provided"), 
+                  TRUE ~ answer
+                ))
   
   ### Reorder the factors so assessment and uncertainty is first. 
   #1) create an object containing the factor names in the desired order
-  reorder_levels <- c("Assessment and Uncertainty", "Biomass", "Recruitment", "Climate Vulnerability", "Commercial Fishery Characterization", "Additional Information")
+  reorder_levels <- c("Assessment and Uncertainty", "Biomass", "Recruitment", "Climate Vulnerability", "Fish Condition", "Commercial Fishery Characterization", "Recreational Fishery Characterization", "Other Socioeconomic Information", "Additional Information")
  
   #2) use the object to overwrite the default levels of the factor column
   matrix <- matrix |> 
@@ -120,12 +136,14 @@ clean_matrix <- function(data){
 clean_scores <- function(data){
 
   scores <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", ends_with("rationale"), ends_with("source"), "climate_score_level")) |>  
-    tidyr::pivot_longer(cols = 3:dplyr::last_col(),
-                        names_to = "factor", 
-                        values_to = "score") |> 
+    # select only the columns that did not include the following information
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", ends_with("rationale"), ends_with("source"), "climate_score_level", starts_with("comm_"), starts_with("rec_"))) |>  
+    # make the table longer by taking
+    tidyr::pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the scores
+                        names_to = "factor", # create a new column named factor from the column names
+                        values_to = "score") |> # create a new column named score from the values in the columns
     tidyr::drop_na(any_of(c("report_year", "stock", "score"))) |>
-    dplyr::mutate(score = as.integer(score)) #,
+    dplyr::mutate(score = as.integer(score)) #, # make the scores an integer
           #  scaled_score = scale_val(score))
   
   return(scores)

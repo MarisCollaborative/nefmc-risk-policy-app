@@ -48,11 +48,15 @@ source(here("helpers.R"))
 ```{r matrix-kbl}
 params$matrix_tbl |> 
     rename_all(str_to_title) |> 
-    rename("Supporting Information" = "Answer") |> 
-    knitr::kable(booktabs = T) |> 
+    rename(#" " = "factor", 
+    #     " " = "value",
+        "Supporting Information" = "Answer") |> 
+    knitr::kable(booktabs = T) |> #, col.names = NULL) |> 
+    # add_header_above(c(" " = 1, "Supporting Information" = 2)) |>
     kable_styling(latex_options = c("hold_position", "scale_down"), position = "float_left", fixed_thead = T) |>
     column_spec(column = 1:2, width = "3cm") |> 
     collapse_rows(columns = 1, valign = "top", latex_hline = "full", longtable_clean_cut = F) |> 
+    # pack_rows("Stock status and Uncertainty", 1, 19, latex_align = "c") |>
     column_spec(column = 3, width = "10cm")
 
 ```
