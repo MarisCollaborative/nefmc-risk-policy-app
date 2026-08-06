@@ -132,7 +132,7 @@ ui <- fluidPage(
               h5(strong("About the Application")), 
               p("This multi-page application was built to support the New England Fishery Management Council's (NEFMC) decision-making when applying its Risk Policy. Data within this application is collected according to the ", 
                 a("Risk Policy Concept Document.", #name of the link 
-                href = "https://d23h0vhsm26o6d.cloudfront.net/Risk-Policy-Statement-and-Concept-Overview-for-posting-v1-final.pdf", # the url
+                href = "https://d23h0vhsm26o6d.cloudfront.net/2_Risk-Policy-Statement-and-Concept-Overview_for-Posting-August-4-2026.pdf", # the url
                 target = "_blank")), # opens in a new tab
               h5(em("Features and functionalities:")),
               tags$ul( # create a bulleted list
