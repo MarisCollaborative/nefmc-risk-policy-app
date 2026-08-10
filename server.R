@@ -65,7 +65,7 @@ weights <- sd_get_data(db, table = "rp-weights") |>
   
 # a static object containing results from the scoring survey
 scores <- sd_get_data(db, table = "rp_scores") |> 
-    clean_scores() #|>  # uses helper function to tidy the data and columns 
+    clean_scores() # uses helper function to tidy the data and columns 
 
 # create a static data frame containing the scores and weights for each factor
 z_data <- left_join(scores, weights, by = c("report_year", "factor")) 
@@ -171,13 +171,7 @@ original_zvals <- reactive({
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
     summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
-              # alpha_recprob = alpha_recprob(zscore), 
-              RecProb= calcRecProb(zscore))#,  # calculate the recommended probability using the logistic function
-    #           perc.diff = percent.diff(alpha_recprob, beta_recprob)) |> 
-    # mutate(alpha_recprob = case_when(
-    #   alpha_recprob < 0.5 ~ 0.5, 
-    #   TRUE ~ alpha_recprob)
-    # )
+              RecProb= calcRecProb(zscore))  # calculate the recommended probability using the logistic function
 })
 
 # Using the "Updated Reactive Value" (regardless of it's state), create a reactive object
@@ -219,18 +213,6 @@ zscore <- reactive({
   zscore_vals()$zscore
   # zscore_vals()$updated$zscore
 })
-
-#  Using the zscore_vals reactive object, pull out the recommended probability value and save in its own reactive for the app and report
-# alpha_prob <- reactive({
-#     str_c( # creating a string that includes: 
-#       round( # the rounded product of 
-#         zscore_vals()$alpha_recprob*100, # the rec_prob value multiplied by 100
-#         #  zscore_vals()$updated$alpha_recprob*100, 
-#         1 # to the nearest tenth,
-#       ),
-#       "%", # and a percent sign,  
-#       sep = "") # without any separating space or punctuation
-# })
   
 RecProb <- reactive({
     str_c( # creating a string that includes: 
@@ -253,39 +235,6 @@ TierArea <- reactive({
   }
 })
 
-# prob_diff <- reactive({
-#     str_c( # creating a string that includes: 
-#       round( # the rounded product of 
-#         zscore_vals()$perc.diff*100, # 
-#         #  zscore_vals()$updated$perc.diff*100, 
-#         1 # to the nearest tenth,
-#       ),
-#       "%", # and a percent sign,  
-#       sep = "") # without any separating space or punctuation
-# })
-
-#  Using the zscore_vals reactive object, create a reactive plot that plots the score and recommended probability
-# alpha_plot <- reactive({
-
-#   plot_alpha(data = original_zvals(), # helper function for plotting the z-score function
-#     # data = zscore_vals()$updated,
-#     xcol = zscore, # and values
-#     ycol = alpha_recprob, 
-#     color = "gray") + 
-#     ggplot2::geom_point(data = zscore_vals(), 
-#   aes(x = zscore, y = alpha_recprob), color = "#3e9eb6", size = 4) 
-# })
-
-# ab_plot <- reactive({
-#   plot_abprob(data = zscore_vals(), # helper function for plotting the z-score function
-#     # data = zscore_vals()$updated,
-#     z = zscore, # and values
-#     alpha = alpha_recprob, 
-#     beta = beta_recprob) #+
-#     # labs(subtitle = "This plot compares the differences between recommended probabilities that were calculated based on the logistic curve approved in the\nAlpha phase of the Risk Policy, and the logistic cuve that is being considered in the Beta phase of the Risk Policy.") + 
-#     # theme(plot.subtitle = element_text(size = 14))
-# })
-  
 RecProb_plot <- reactive({
   plotRecProb(data = zscore_vals(), 
               z = zscore, 
@@ -314,32 +263,7 @@ output$zscore <- renderText(
 
   )
 
-# Print the recommended probability value by
-# output$AlphaProb <- renderText(
-    
-#   alpha_prob()
 
-# )
-
-# Plot the z-score and recommended probability values
-# output$alpha_plot <- renderPlot({
-
-#   alpha_plot()
-  
-# })
-  
-# output$ab_plot <- renderPlot({
-
-#   ab_plot()
-  
-# })
-  
-# output$BetaProb <- renderText(
-    
-#   beta_prob()
-
-# )
-  
 output$plot <- renderPlot(
     
   RecProb_plot() + 
@@ -363,12 +287,6 @@ output$ClassifyZone <- renderText(
   TierArea()
 )
 
-
-# output$PercDiff <- renderText(
-    
-#   prob_diff()
-
-# )
   
 ## Report #### =====================================================================
 # create a temporary file location

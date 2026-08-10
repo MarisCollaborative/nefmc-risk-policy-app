@@ -6,13 +6,6 @@ library(here)
 library(nefishr)
 
 ## General helpers #### ===============================================================
-### Scale a value ####
-#' 
-#' 
-#' 
-# scale_val <- function(x, y = 4){ x / {{y}} }
-
-
 ### Normalize a value ####
 #' 
 #' 
@@ -27,23 +20,12 @@ normalize_val <- function(x){ x / sum(x) }
 #' 
 calc_zscore <- function(score, weight){ sum({{score}}*{{weight}}, na.rm =T) }
 
-### Calculate the recommended probability ###
-#' Logistic function that truncates the curve at ymin = 0.5. 
-#' 
-#' 
-# alpha_recprob <- function(z){ 1/(1+exp(-z)) }
-
 ### Recommended probability function ####
 #' Logistic function that fits the full curve between 0.5 and 1 y-limits
 #' 
 #' 
 #' 
 calcRecProb <- function(z){ 0.5 + (0.5/(1+exp(z))) }
-
-### Percent difference ####
-# percent.diff <- function(x1, x2) {
-#   (x2 - x1) / abs(x1)
-# }
 
 ### Render Report function #####
 #'
@@ -168,64 +150,10 @@ clean_weights <- function(data){
     dplyr::summarise(avg_weight = round(
                                         mean(weight, na.rm = T), 
                                         2),
-                    .by = c(report_year, factor)) #|>
-    # dplyr::mutate(normalized_weight = round(normalize_val(avg_weight), 2)) 
-  
-    # sum_wt <- sum(weights$avg_weight)
-  
-    # weights <- weights |> 
-      # mutate(normalized_weight = round(avg_weight / sum_wt, 2))
+                    .by = c(report_year, factor)) 
 
   return(weights)
 }
-
-### Plot Alpha Plot ####
-#' Plots the originally proposed logisitc function
-#' 
-#' 
-#' 
-# plot_alpha <- function(data, xcol, ycol, color = "#3e9eb6", ...){
-#     ggplot2::ggplot() + 
-#         ggplot2::lims(x = c(0,4), y = c(0.5,1))+
-#         ggplot2::geom_function(fun = alpha_recprob, linewidth = 1) + 
-#         ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
-#         ggplot2::geom_point(data = {{ data }}, aes(x = {{xcol}}, y = {{ycol}}, color = "Recommended\nProbability"), size = 4) +
-#         ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Recommended\nProbability" = {{color}} )) +
-#         ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
-#         ggplot2::theme_bw() +
-#         ggplot2::theme(axis.title = element_text(size = rel(1.25)),
-#               axis.text = element_text(size = rel(1.25)), 
-#               legend.position = "bottom", 
-#               legend.title = element_text(size = rel(1.25)),
-#               legend.text = element_text(size = rel(1.25)), 
-#               legend.key.spacing = unit(0.5, "cm")) + 
-#         ggplot2::coord_fixed(ratio = 4)
-# }
-
-
-### Plot Alpha and Beta functions ####
-#' Plots alpha and beta functions on the same pane to show differences in z-scores between approaches
-#' 
-#' 
-# plot_abprob <- function(data, z, alpha = NULL, beta){
-#     ggplot2::ggplot() + 
-#         ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
-#         # ggplot2::geom_function(fun = alpha_recprob, linewidth = 1, lty = 2) + 
-#         # ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{alpha}}, color = "Alpha\nRecommended\nProbability"), size = 4) +
-#         ggplot2::geom_function(fun = beta_recprob, linewidth = 1, lty = 3) + 
-#         ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
-#         ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{beta}}, color = "Beta\nRecommended\nProbability"), size = 4) +
-#         ggplot2::scale_color_manual(name = "Legend", values = c("MSA 50%\nprobability limit" = "red", "Alpha\nRecommended\nProbability" = "#3e9eb6", "Beta\nRecommended\nProbability" = "red")) +
-#         ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
-#         ggplot2::theme_bw() +
-#         ggplot2::theme(axis.title = element_text(size = rel(1.25)),
-#               axis.text = element_text(size = rel(1.25)), 
-#               legend.position = "bottom", 
-#               legend.title = element_text(size = rel(1.25)),
-#               legend.text = element_text(size = rel(1.25)), 
-#               legend.key.spacing = unit(0.5, "cm")) + 
-#         ggplot2::coord_fixed(ratio = 8)
-# }
 
 ### Plot the Recommended Probability ####
 #' Plots the logistic function 
