@@ -142,7 +142,7 @@ clean_scores <- function(data){
     tidyr::pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the scores
                         names_to = "factor", # create a new column named factor from the column names
                         values_to = "score") |> # create a new column named score from the values in the columns
-    tidyr::drop_na(any_of(c("report_year", "stock", "score"))) |>
+    tidyr::drop_na(any_of(c("report_year"))) |>#, "stock", "score"))) |>
     dplyr::mutate(score = as.integer(score)) #, # make the scores an integer
           #  scaled_score = scale_val(score))
   
