@@ -5103,13 +5103,16 @@
       "checksum": "eae835a316eb46eec45a56839a1be351"
     },
     ".Rprofile": {
-      "checksum": "b1819838029b7f72b8275620259fd739"
+      "checksum": "327bd03748f6ec56032327c638e3be90"
     },
     "app.R": {
       "checksum": "001b6a6191733cb394d04f23f427edcb"
     },
     "helpers.R": {
       "checksum": "7f6e6967704f9f6cb9f505c1e50625dd"
+    },
+    "normalized_wt_differences.csv": {
+      "checksum": "5512482afc6fab7de1c7bc1b78a6637d"
     },
     "README.md": {
       "checksum": "73f1c6b3bb448ed30c1d8d06b6fc8226"
@@ -5124,7 +5127,7 @@
       "checksum": "41a8421d728e750335f1b3e9d131a8c6"
     },
     "server.R": {
-      "checksum": "53f1b31c9160d680781f21303e44a538"
+      "checksum": "045a0a20a4bd29387ff3b6d9dd6620ea"
     },
     "shiny_quarto_data/data_chunks_index.txt": {
       "checksum": "e9a7b18a42db655a265232f05ac57d0e"
