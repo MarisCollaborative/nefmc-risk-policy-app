@@ -25,7 +25,7 @@ normalize_val <- function(x){ x / sum(x) }
 #' 
 #' 
 #' 
-calc_zscore <- function(score, weight){ sum({{score}}*{{weight}}) }
+calc_zscore <- function(score, weight){ sum({{score}}*{{weight}}, na.rm =T) }
 
 ### Calculate the recommended probability ###
 #' Logistic function that truncates the curve at ymin = 0.5. 

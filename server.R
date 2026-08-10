@@ -65,10 +65,12 @@ weights <- sd_get_data(db, table = "rp-weights") |>
   
 # a static object containing results from the scoring survey
 scores <- sd_get_data(db, table = "rp_scores") |> 
-    clean_scores() # uses helper function to tidy the data and columns 
-  
+    clean_scores() |>  # uses helper function to tidy the data and columns 
+    filter(stock == stock())
+
 # create a static data frame containing the scores and weights for each factor
-z_data <- left_join(scores, weights, by = c("report_year", "factor"))
+z_data <- full_join(scores, weights, by = c("report_year", "factor")) |> 
+  complete(fill = list(stock = stock()))
 
 # create a reactive value for later manipulation and restoration
 zdata_rv <- reactiveValues(original = z_data, 
