@@ -121,7 +121,9 @@ clean_scores <- function(data){
     # select only the columns that did not include the following information
     dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", ends_with("rationale"), ends_with("source"), "climate_score_level", starts_with("comm_"), starts_with("rec_"))) |>  
     # make the table longer by taking
-    tidyr::pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the scores
+    dplyr::relocate(staff_name, .before = report_year) |>
+    dplyr::relocate(draft_date, .after = staff_name) |> 
+    tidyr::pivot_longer(cols = 5:dplyr::last_col(), # all the columns with the scores
                         names_to = "factor", # create a new column named factor from the column names
                         values_to = "score") |> # create a new column named score from the values in the columns
     tidyr::drop_na(any_of(c("report_year", "stock", "score"))) |>

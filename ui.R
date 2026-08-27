@@ -14,17 +14,19 @@ library(bsicons)
 db <- sd_db_connect(".env")
 
 # fetch the risk policy scores from the database 
-data <- sd_get_data(db, "rp_scores")
+data <- sd_get_data(db, "rp_scores_dev")
 
 # identify the unique values of report year that occur in the table
 year_vals <- unique(data$report_year) |> sort()
-
 
 # identify the unique values of Stock Name from the nefmc_species dataframe in the nefishr package
 stock_vals <- unique(nefishr::nefmc_species$STOCK_NAME) |> sort()
 
 # identify the unique values of FMP from the nefmc_species dataframe in the nefishr package
 fmp_vals <- unique(nefishr::nefmc_species$FMP) |> sort()
+
+# identify the unique values of report year that occur in the table
+date_vals <- unique(data$draft_date) |> sort()
 
 # User Interface ####
 ui <- fluidPage(
@@ -57,15 +59,21 @@ ui <- fluidPage(
                             label = strong("Select stock"), 
                             choices = c("Select a stock...", stock_vals), # using the unique stock values from the nefmc_species table
                             selected = "Select a stock..."), # the initial value shown when the user starts the app
+                
+                ## Draft selection 
+                selectInput(inputId = 'draft_date', 
+                            label = strong("Select the date drafted"), 
+                            choices = c("Select a date...", date_vals), 
+                            selected = "Select a date..."),
                 br(), 
                 # Generate Report button
                 downloadButton("report", "Generate report")
                   # uiOutput("downloadReport")
                 ),
               # Page 1 - shows the matrix table based on the sidebar inputs ===========================================================
-              nav_panel(title = "Matrix",
-                        gt_output("matrix")
-                        ), 
+              # nav_panel(title = "Matrix",
+              #           gt_output("matrix")
+              #           ), 
               # Page 2 - shows the recommended probability information based on user inputs and contains
               nav_panel(title = "Recommended Probability",
                     ###  a collapsible card to change the recommended probability =====================================================
@@ -132,13 +140,13 @@ ui <- fluidPage(
               h5(strong("About the Application")), 
               p("This multi-page application was built to support the New England Fishery Management Council's (NEFMC) decision-making when applying its Risk Policy. Data within this application is collected according to the ", 
                 a("Risk Policy Concept Document.", #name of the link 
-                href = "https://d23h0vhsm26o6d.cloudfront.net/2_Risk-Policy-Statement-and-Concept-Overview_for-Posting-August-4-2026.pdf", # the url
+                href = "https://d23h0vhsm26o6d.cloudfront.net/Risk-Policy-Statement-and-Concept-Overview_for-Posting-August-12-2026.pdf", # the url
                 target = "_blank")), # opens in a new tab
               h5(em("Features and functionalities:")),
               tags$ul( # create a bulleted list
                 tags$li(strong("A top navigation bar:"), " to navigate throughout the application"), 
                 tags$li(strong("A user selection menu:"), " a collapsible menu on the left-hand side to filter the data within the application based on a specific Council action year, Fishery Management Plan, and stock. Hide the menu using the carrot in the top right corner of the menu."), 
-                tags$li(strong("The Matrix page:"), " displays additional qualitative information and context for the selected stock that was considered during the decision-making process for each of the Risk Policy factors."),
+                # tags$li(strong("The Matrix page:"), " displays additional qualitative information and context for the selected stock that was considered during the decision-making process for each of the Risk Policy factors."),
                 tags$li(strong("The Recommended Probability page:"), " displays the quantitative outputs of the Risk Policy mechanics. It includes a table of the risk policy factors scored and scaled by the FMP Plan Development Teams, the average weights for each factor approved by the Council; statements about the calculated values of the Z-score and recommended probability; and the final Z-score plotted along the recommended probability curve."), 
                 tags$li(strong("A Generate Report button:"), " nested within the user selection menu. Clicking this button will generate and download a report onto your device containing information from the Matrix and Recommended Probability page based on the user's selections in the menu."))
           )

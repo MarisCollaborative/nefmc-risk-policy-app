@@ -1,12 +1,13 @@
 ---
-title: "`r params$year` Risk Policy Report for `r params$stock`"
-date: "`r format(Sys.time(), '%B %d, %Y')`"
+title: "DRAFT `r params$year` Risk Policy Report for `r params$stock`"
+date: "`r params$draft_date`"
 output: pdf_document
 params: # NA because they will be replaced by the shiny app parameters
     year: NA
     stock: NA 
     fmp: NA 
-    matrix_tbl: NA
+    draft_date: NA
+    # matrix_tbl: NA
     scores: NA
     plot_data: NA
     zscore: NA
@@ -27,7 +28,7 @@ source(here("helpers.R"))
 ```
 
 
-```{r matrix-ft}
+<!-- ```{r matrix-ft}
 # set_flextable_defaults(na_str = "")
 
 # params$matrix_tbl |> 
@@ -43,45 +44,42 @@ source(here("helpers.R"))
 #     border_inner() |> 
 #     width(width = c(1.5, 2.0, 3.5)) |> 
 #     align(j = 3, align = "justify")
-```
+``` -->
 
-```{r matrix-kbl}
-params$matrix_tbl |> 
-    rename_all(str_to_title) |> 
-    rename(#" " = "factor", 
-    #     " " = "value",
-        "Supporting Information" = "Answer") |> 
-    knitr::kable(booktabs = T) |> #, col.names = NULL) |> 
-    # add_header_above(c(" " = 1, "Supporting Information" = 2)) |>
-    kable_styling(latex_options = c("hold_position", "scale_down"), position = "float_left", fixed_thead = T) |>
-    column_spec(column = 1:2, width = "3cm") |> 
-    collapse_rows(columns = 1, valign = "top", latex_hline = "full", longtable_clean_cut = F) |> 
-    # pack_rows("Stock status and Uncertainty", 1, 19, latex_align = "c") |>
-    column_spec(column = 3, width = "10cm")
+<!-- ```{r matrix-kbl}
+# params$matrix_tbl |> 
+#     rename_all(str_to_title) |> 
+#     rename(#" " = "factor", 
+#     #     " " = "value",
+#         "Supporting Information" = "Answer") |> 
+#     knitr::kable(booktabs = T) |> #, col.names = NULL) |> 
+#     # add_header_above(c(" " = 1, "Supporting Information" = 2)) |>
+#     kable_styling(latex_options = c("hold_position", "scale_down"), position = "float_left", fixed_thead = T) |>
+#     column_spec(column = 1:2, width = "3cm") |> 
+#     collapse_rows(columns = 1, valign = "top", latex_hline = "full", longtable_clean_cut = F) |> 
+#     # pack_rows("Stock status and Uncertainty", 1, 19, latex_align = "c") |>
+#     column_spec(column = 3, width = "10cm")
 
-```
+``` -->
 
-\newpage 
+<!-- \newpage  -->
 
 ## Scores and Weights 
 
 ```{r scores}
 
-params$scores |> tab_options(table.width = pct(80), latex.tbl.pos = "ht") 
+params$scores |> tab_options(table.width = pct(100), latex.tbl.pos = "ht") 
 
 ```
 
-The calculated z-score is **`r params$zscore`**\
-\
-The recommended probability is **`r params$RecProb`**\  
-
+The calculated z-score is **`r params$zscore`**. The recommended probability is **`r params$RecProb`**.\  
 
 
 ## Recommended Probability
 The level of risk that should be considered based on the z-score and recommended probability for `r params$stock` is _`r params$tier`._\
 \
-\
-```{r zplot, fig.height = 5.5}
+
+```{r zplot, fig.height = 4.5}
 plotRecProb(data = params$plot_data, 
               z = zscore, 
               RecProb = RecProb, 

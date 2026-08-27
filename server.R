@@ -17,12 +17,28 @@ db <- surveydown::sd_db_connect()
 # Server #### =========================================================================
 server <- function(input, output, session) {
 
-## Server Parameters #### =============================================================
 # disable report button upon start up
 observe({
   shinyjs::disable(id = "report")
 })
 
+## Fetch data #### ====================================================================
+## get risk policy data from the database
+# a reactive object containing results from the matrix survey
+info <- sd_get_data(db,
+                      table = "rp_matrix_tbl",
+                      refresh_interval = 30) 
+
+# a static object containing results from the weightings survey
+weights <- sd_get_data(db, table = "rp-weights") |> 
+    clean_weights() # uses helper function to tidy the data and columns 
+
+  
+# a static object containing results from the scoring survey
+scores <- sd_get_data(db, table = "rp_scores_dev") |> 
+    clean_scores() # uses helper function to tidy the data and columns 
+
+## Server Parameters #### =============================================================
 # create reactive element for selected year 
 year <- reactive(input$year)
   
@@ -43,36 +59,28 @@ observeEvent(input$fmp, {
 
 # create reactive element for selected stock
 stock <- reactive(input$stock)
+  
+# when a user selects a stock 
+observeEvent(input$stock, {
+  #Filter choices for the dates 
+  dates_drafted <- scores |> 
+    dplyr::filter(stock == stock()) |> 
+    dplyr::pull(draft_date) |> 
+    unique() |> 
+    sort()
 
+  # update the stock selection drop down with only the choices for a given fmp
+  updateSelectInput(session, "draft_date", choices = c("Select a date...", dates_drafted))
+})
+
+date_drafted <- reactive(input$draft_date)
+    
 # only allow the "Generate report button" to be active if a stock has been selected.
 observe({
-  if (req(input$stock) != "Select a stock...") {
+  if (req(input$draft_date) != "Select a date...") {
     enable("report")
   }
 })
-
-## Fetch data #### ====================================================================
-## get risk policy data from the database
-# a reactive object containing results from the matrix survey
-info <- sd_get_data(db,
-                      table = "rp_matrix_tbl",
-                      refresh_interval = 30) 
-
-# a static object containing results from the weightings survey
-weights <- sd_get_data(db, table = "rp-weights") |> 
-    clean_weights() # uses helper function to tidy the data and columns 
-
-  
-# a static object containing results from the scoring survey
-scores <- sd_get_data(db, table = "rp_scores") |> 
-    clean_scores() # uses helper function to tidy the data and columns 
-
-# create a static data frame containing the scores and weights for each factor
-z_data <- left_join(scores, weights, by = c("report_year", "factor")) 
-
-# create a reactive value for later manipulation and restoration
-zdata_rv <- reactiveValues(original = z_data, 
-                           updated = z_data)
                       
   
 ## Page 1: Matrix Output #### ========================================================
@@ -112,7 +120,13 @@ output$matrix <- render_gt({
 
 
 ## Page 2: Scores, Weights, Plots #### ================================================
-### Initial Reactives ####==============================================================
+# create a static data frame containing the scores and weights for each factor
+z_data <- left_join(scores, weights, by = c("report_year", "factor")) 
+
+# create a reactive value for later manipulation and restoration
+zdata_rv <- reactiveValues(original = z_data, 
+                           updated = z_data)
+  ### Initial Reactives ####==============================================================
 # create reactive objects based on slider inputs for each factors; stores the value from the slider 
 # biomass <- reactive(input$changeBiomass*2)
 # recruitment <- reactive(input$changeRecruitment*2)
@@ -168,7 +182,7 @@ output$matrix <- render_gt({
 ### Final Reactives #### ================================================================
 original_zvals <- reactive({
   zdata_rv$original |> 
-    filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
+    filter(report_year == year(), stock == stock(), draft_date == date_drafted()) |> # filtered by user inputs for year and stock, and
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
     summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
               RecProb= calcRecProb(zscore))  # calculate the recommended probability using the logistic function
@@ -177,7 +191,7 @@ original_zvals <- reactive({
 # Using the "Updated Reactive Value" (regardless of it's state), create a reactive object
 zscore_vals <- reactive({
   zdata_rv$updated |> 
-    filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
+    filter(report_year == year(), stock == stock(), draft_date == date_drafted()) |> # filtered by user inputs for year and stock, and
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
     summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
               RecProb = calcRecProb(zscore))  # calculate the recommended probability using the logistic function
@@ -187,9 +201,9 @@ zscore_vals <- reactive({
 # Using the "Updated Reactive Value" (regardless of it's state), create a data reactive that can be used in the shiny output and report
 final_scores <- reactive({ 
   zdata_rv$updated |> 
-    filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock
+    filter(report_year == year(), stock == stock(), draft_date == date_drafted()) |> # filtered by user inputs for year and stock
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
-    select(!c(normalized_weight)) |> 
+    select(!c(normalized_weight, staff_name)) |> 
     gt() |> 
     text_transform(str_to_title, locations = cells_body(columns = factor)) |> 
     cols_label(
@@ -202,8 +216,10 @@ final_scores <- reactive({
         md()
     }
   ) |> 
+    cols_align(align = "center", 
+               columns = c(draft_date, report_year)) |> 
     cols_align(align = "left", 
-               columns = c(report_year, stock, factor)) |> 
+               columns = c(stock, factor)) |> 
     cols_align(align = "right", 
                columns = c(score, avg_weight))
 })
@@ -252,7 +268,7 @@ output$scores <- render_gt({
   }
 
    final_scores() |> 
-    tab_options(table.width = pct(80))
+    tab_options(table.width = pct(100))
     
 })
 
@@ -290,14 +306,17 @@ output$ClassifyZone <- renderText(
   
 ## Report #### =====================================================================
 # create a temporary file location
-report_path <- tempfile(fileext = ".qmd")
+report_path <- tempfile(fileext = ".Rmd")
 
 ## copy the RMD file in the repo to the temporary file location and overwrite if already existing
 file.copy("rp_report_template.Rmd", report_path, overwrite = TRUE)
   
 report_name <- reactive({
-  stringr::str_replace_all(stock(), pattern = "[:space:]", replace = "_") |> 
-  stringr::str_c("_rp-report_", year(), ".pdf", sep = "")
+  stock_name <- stringr::str_replace_all(stock(), pattern = "[:space:]", replace = "_") 
+  
+  date <- stringr::str_replace_all(date_drafted(), pattern = "-", replace = "")
+
+  stringr::str_c("DRAFT_", stock_name, "_rp-report_", date, ".pdf", sep = "")
 })
 
 output$report <- downloadHandler(
@@ -314,8 +333,9 @@ output$report <- downloadHandler(
     # Generate the Quarto params
     params <- list(year = year(), 
                    stock = stock(), 
-                  #  fmp = fmp(),
-                   matrix_tbl = matrix_tbl(),
+                   draft_date = date_drafted(),
+                   fmp = fmp(),
+                  # matrix_tbl = matrix_tbl(),
                    scores = final_scores(), 
                    zscore = zscore(), 
                    RecProb = RecProb(), 
