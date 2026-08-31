@@ -95,6 +95,7 @@ output$matrix <- render_gt({
   }
 
     matrix_tbl() |>
+      filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
       gt(rowname_col = "value", 
          groupname_col = "factor", # group rows based on the factor column
          row_group_as_column = TRUE) |> 

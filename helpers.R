@@ -54,7 +54,7 @@ clean_matrix <- function(data){
     tidyr::drop_na(report_year) |> 
     # dplyr::mutate(across(3:dplyr::last_col(), ~as.character(.))) |>
     dplyr::relocate("terminal_assessment_year", .after = "assessment_model") |>  
-    # dplyr::relocate("signif_catch_present", .before = "signif_catch_information") |> 
+    dplyr::relocate("rec_acl", .before = "rec_fishery") |> 
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "value", 
                         values_to = "answer") |> 
@@ -65,7 +65,7 @@ clean_matrix <- function(data){
             value %in% c("no_of_prey", "prey_information") ~ "Fish Condition",
             value %in% c("assessment_type", "assessment_model", "retro_pattern", "retro_val", "data_used", "missing_data", "uncertainty_sources", "terminal_assessment_year") ~ "Assessment and Uncertainty",
             value %in% c("commercial_revenue", "commercial_catch", "commercial_dealers", "commercial_mgmt", "commercial_vessels", "commercial_dealers", "commercial_ports", "other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
-            value %in% c("rec_fishery", "recreational_catch", "recreational_trips", "recreational_mgmt", "recreational_ports") ~ "Recreational Fishery Characterization", 
+            value %in% c("rec_acl", "rec_fishery", "recreational_catch", "recreational_trips", "recreational_mgmt", "recreational_ports") ~ "Recreational Fishery Characterization", 
             value == "other_econ_info" ~ "Other Socioeconomic Information",
             value %in% c("fmsy_ref_pt", "ssb_ref_pt", "msy_ref_pt", "OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
             TRUE ~ value
@@ -83,7 +83,8 @@ clean_matrix <- function(data){
                         value == "retro_pattern" ~ "Retrospective Pattern", 
                         value == "retro_val" ~ "Retrospective Values",
                         value == "commercial_mgmt" ~ "Commercial Management Uncertainty Buffer", 
-                        value == "rec_fishery" ~ "Recreational Fishery", 
+                        value == "rec_acl" ~ "Recreational Fishery Management",
+                        value == "rec_fishery" ~ "Recreational Fishery Activity", 
                         value == "recreational_mgmt" ~ "Recreational Management Uncertainty Buffer", 
                         value == "other_econ_info" ~ "Other Socioeconomic Information", 
                         value == "signif_catch_present" ~ "Significant Catch Present", 

@@ -47,6 +47,7 @@ source(here("helpers.R"))
 
 ```{r matrix-kbl}
 params$matrix_tbl |> 
+    filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
     rename_all(str_to_title) |> 
     rename(#" " = "factor", 
     #     " " = "value",
