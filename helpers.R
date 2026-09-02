@@ -32,7 +32,7 @@ calcRecProb <- function(z){ 0.5 + (0.5/(1+exp(z))) }
 #' 
 #' 
 ## create render report function 
-render_report <- function(input, output, params) {
+render_report <- function(input, output, params, ...) {
   # render the report by rendering the RMD file
   rmarkdown::render(input,
     output_file = output,
@@ -131,6 +131,22 @@ clean_scores <- function(data){
           #  scaled_score = scale_val(score))
   
   return(scores)
+  
+}
+
+### Get additional information for each score ####
+#' Cleans the score table by removing non-important columns
+#' 
+#' 
+get_score_info <- function(data){
+
+  score_info <- data |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "climate_score_level", starts_with("comm_"), starts_with("rec_"))) |>
+    tidyr::drop_na(any_of(c("report_year", "stock"))) |> 
+    dplyr::relocate("commercial", .after = "climate_source") |> 
+    dplyr::relocate("recreational", .after = "commercial_source") 
+  
+  return(score_info)
   
 }
 

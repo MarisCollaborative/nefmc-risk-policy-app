@@ -7,14 +7,13 @@ params: # NA because they will be replaced by the shiny app parameters
     stock: NA 
     fmp: NA 
     draft_date: NA
-    # matrix_tbl: NA
+    weights: NA
+    all_score_info: NA
     scores: NA
     plot_data: NA
     zscore: NA
     RecProb: NA
-    # plot: NA
     tier: NA
-    # rationale: NA
 ---
 ```{r setup, include=FALSE}
 # set echo in all code chunks so they are not included in the output file

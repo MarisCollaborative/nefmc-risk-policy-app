@@ -5103,13 +5103,19 @@
       "checksum": "eae835a316eb46eec45a56839a1be351"
     },
     ".Rprofile": {
-      "checksum": "a13d00549c2983187019ee569cd52644"
+      "checksum": "82d200ae1acb4dba3bf4f1438ef00201"
     },
     "app.R": {
       "checksum": "001b6a6191733cb394d04f23f427edcb"
     },
     "helpers.R": {
-      "checksum": "bca1eec5140f09c500c79bbf649c01b0"
+      "checksum": "15c107c0678f25c0ebac2e30aba5cd46"
+    },
+    "NEFMC_PPT_MASTER_2026.potx": {
+      "checksum": "20708a904908501fce925ba0c60016fb"
+    },
+    "NEFMC_PPT_MASTER_2026.pptx": {
+      "checksum": "1cb266568d1b23b7e11052501a1b4d10"
     },
     "normalized_wt_differences.csv": {
       "checksum": "5512482afc6fab7de1c7bc1b78a6637d"
@@ -5120,14 +5126,14 @@
     "renv.lock": {
       "checksum": "bede86eb9cf9010952af3ec6ca87f266"
     },
-    "rp_report_template copy.Rmd": {
-      "checksum": "be6e60b28ef1a3bb61fce5214f31f909"
+    "rp_ppt_template.Rmd": {
+      "checksum": "ba8f6cc6800329313bbd92f1a6ebe037"
     },
     "rp_report_template.Rmd": {
-      "checksum": "41a8421d728e750335f1b3e9d131a8c6"
+      "checksum": "7202e19b696aeb3036e8efb7508f7a28"
     },
     "server.R": {
-      "checksum": "ab2101cad9bfbfb4200310064c5ce60a"
+      "checksum": "679c3c41b31b83c95b51a96f4b1b0286"
     },
     "shiny_quarto_data/data_chunks_index.txt": {
       "checksum": "e9a7b18a42db655a265232f05ac57d0e"
@@ -5208,7 +5214,7 @@
       "checksum": "d828775275749701b48bd9d958814111"
     },
     "ui.R": {
-      "checksum": "0b878c5f92bd332e2044ca225b034a36"
+      "checksum": "5521f12d94423ed98d9bdbd87ea17ee6"
     }
   },
   "users": null

@@ -67,7 +67,7 @@ ui <- fluidPage(
                             selected = "Select a date..."),
                 br(), 
                 # Generate Report button
-                downloadButton("report", "Generate report")
+                downloadButton("report", "Generate report documents")
                   # uiOutput("downloadReport")
                 ),
               # Page 1 - shows the matrix table based on the sidebar inputs ===========================================================

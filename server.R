@@ -35,7 +35,9 @@ weights <- sd_get_data(db, table = "rp-weights") |>
 
   
 # a static object containing results from the scoring survey
-scores <- sd_get_data(db, table = "rp_scores_dev") |> 
+raw_score_data <- sd_get_data(db, table = "rp_scores_dev") 
+all_score_info <- raw_score_data |> get_score_info()
+scores <- raw_score_data |> 
     clean_scores() # uses helper function to tidy the data and columns 
 
 ## Server Parameters #### =============================================================
@@ -305,37 +307,56 @@ output$ClassifyZone <- renderText(
 
   
 ## Report #### =====================================================================
-# create a temporary file location
-report_path <- tempfile(fileext = ".Rmd")
 
-## copy the RMD file in the repo to the temporary file location and overwrite if already existing
-file.copy("rp_report_template.Rmd", report_path, overwrite = TRUE)
-  
-report_name <- reactive({
+file_name <- reactive({
   stock_name <- stringr::str_replace_all(stock(), pattern = "[:space:]", replace = "_") 
   
   date <- stringr::str_replace_all(date_drafted(), pattern = "-", replace = "")
 
-  stringr::str_c("DRAFT_", stock_name, "_rp-report_", date, ".pdf", sep = "")
+  stringr::str_c("DRAFT_", stock_name, "_rp-report_", date, sep = "")
 })
 
 output$report <- downloadHandler(
+  # 1. Define the filename
   filename = function() {
-      report_name()
+      str_c(file_name(), "zip", sep=".")
     }, 
-  content = function(file) {
+  # generate the files and compress them
+  content = function(file) {    
     # Use withProgress to show a progress bar
-    withProgress(message = "Creating Report: ", value = 0, {
+    withProgress(message = "Bundling Report: ", value = 0, {
 
     # Stage 1: Increment progress
     incProgress(0.1, detail = "Collecting inputs...")
+    
+    # 1. Create AN ISOLATED TEMP DIRECTORY INSIDE THE HANDLER
+    report_path <- tempdir()
+    dir.create(report_path, showWarnings = FALSE)
 
-    # Generate the Quarto params
+    # 2. DEFINE AND EXECUTE COPIES INSIDE THE HANDLER
+    # Define paths for Rmd files
+    pdf_src <- normalizePath("rp_report_template.Rmd", mustWork = TRUE)
+    ppt_src <- normalizePath("rp_ppt_template.Rmd", mustWork = TRUE)
+    ppt_ref_src <- normalizePath("NEFMC_PPT_MASTER_2026.pptx", mustWork = TRUE)  
+      
+    # Define temporary paths for the two individual files
+    tmp_pdf <- file.path(report_path,"rp_report_template.Rmd")
+    tmp_ppt <- file.path(report_path, "rp_ppt_template.Rmd")  
+    tmp_pptx_ref <-  file.path(report_path, "NEFMC_PPT_MASTER_2026.pptx")
+      
+    ## copy the RMD files in the repo to the temporary file locations and overwrite if already existing
+    file.copy(from = pdf_src, to = tmp_pdf, overwrite = TRUE)
+    file.copy(from = ppt_src, to = tmp_ppt, overwrite = TRUE)
+    file.copy(from = ppt_ref_src, to = tmp_pptx_ref, overwrite = TRUE)
+
+    # Generate the RMarkdown params
     params <- list(year = year(), 
                    stock = stock(), 
                    draft_date = date_drafted(),
                    fmp = fmp(),
                   # matrix_tbl = matrix_tbl(),
+                   weights = weights,
+                   all_score_info = all_score_info,
                    scores = final_scores(), 
                    zscore = zscore(), 
                    RecProb = RecProb(), 
@@ -349,32 +370,49 @@ output$report <- downloadHandler(
     print(params)
 
     # debug file path
-    # print(paste("Temporary output file path:", temp_output_dir))
-    print(paste("file name path:", report_name()))
+    print(paste("file name path:", file_name()))
     print(paste("Final output file path:", file))
-    # quarto_file <- normalizePath(here("draft_report.qmd", mustWork = TRUE))
-    # Temporarily switch to a temp directory to avoid write permission issues
-    # and ensure unique file generation for concurrent users
+    
      incProgress(0.2, detail = "Building...")
         
         tryCatch({
+
+          # Create file names for each document 
+          pdf_filename  <- stringr::str_c(file_name(), "pdf", sep=".")
+          pptx_filename <- stringr::str_c(file_name(), "pptx", sep=".")
           
-          render_report(input = report_path, output = file, params = params)
-          
+          # Render the documents in their respective temporary locations
+          render_report(input = tmp_pdf, output = pdf_filename, params = params)
+          render_report(input = tmp_ppt, output = pptx_filename, params = params)#,
+            #  output_format = rmarkdown::powerpoint_presentation(reference_doc = tmp_pptx_ref)) 
+            
+          # 3. FIX WORKING DIRECTORY AND ZIP PATHS
+          # Temporarily change working directory to report_path for clean zipping paths
+          # Store original working directory
+          owd <- getwd()
+
+          # Ensure we return to the original working directory even if zipping fails
+          on.exit(setwd(owd), add = TRUE)
+
+          # Switch to the build folder so zip doesn't include the absolute path tree
+          setwd(report_path)
+
+          docs <- c(pdf_filename, pptx_filename)
+          # Create the zip archive directly to the target 'file' location
+          zip::zip(zipfile = file, files = docs)
           
           incProgress(0.95, detail = "Downloading report...")
-          
-          # Copy the generated file to the correct location for download
-          # file.copy(report_name(), file, overwrite = TRUE)
-          
+                    
         }, error = function(e) {
           
-          print(paste("Error generating RMD report:", e$message))
-          
+          print(paste("Error bundling reports:", e$message))
+          # Proactively stop execution so Shiny doesn't return an empty/broken file
+          stop(e)
         })
-      }
-      )
     }
+      )
+  }, 
+  contentType = "application/zip"
   )
 }
 
