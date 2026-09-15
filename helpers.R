@@ -50,10 +50,13 @@ render_report <- function(input, output, params) {
 clean_matrix <- function(data){
 
   matrix <- data |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "name")) |> 
+    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "name", ends_with("source"))) |> 
     tidyr::drop_na(report_year) |> 
     # dplyr::mutate(across(3:dplyr::last_col(), ~as.character(.))) |>
     dplyr::relocate("terminal_assessment_year", .after = "assessment_model") |>  
+    dplyr::relocate("uncertainty_sources", .before = "overfished") |>  
+    dplyr::relocate("fish_condition", .after = "prey_information") |> 
+    dplyr::relocate("commercial_exvessel", .before = "commercial_revenue") |> 
     dplyr::relocate("rec_acl", .before = "rec_fishery") |> 
     tidyr::pivot_longer(cols = 3:dplyr::last_col(),
                         names_to = "value", 
@@ -62,9 +65,9 @@ clean_matrix <- function(data){
             value %in% c("overfished", "overfishing", "rebuilding_plan", "rebuilding_target", "ssb", "relative_ssb") ~ "Biomass",
             value %in% c("recruit_incl", "recruitment_model", "beg_recruit_yr", "other_recruit_info", "recruit_ests") ~ "Recruitment",
             value %in% c("climate_vulnerability", "climate_direction") ~ "Climate Vulnerability",
-            value %in% c("no_of_prey", "prey_information") ~ "Fish Condition",
+            value %in% c("no_of_prey", "prey_information", "fish_condition") ~ "Fish Condition",
             value %in% c("assessment_type", "assessment_model", "retro_pattern", "retro_val", "data_used", "missing_data", "uncertainty_sources", "terminal_assessment_year") ~ "Assessment and Uncertainty",
-            value %in% c("commercial_revenue", "commercial_catch", "commercial_dealers", "commercial_mgmt", "commercial_vessels", "commercial_dealers", "commercial_ports", "other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
+            value %in% c("commercial_exvessel", "commercial_revenue", "commercial_catch", "commercial_dealers", "commercial_mgmt", "commercial_vessels", "commercial_dealers", "commercial_ports", "other_quota_reliance", "other_fisheries") ~ "Commercial Fishery Characterization",
             value %in% c("rec_acl", "rec_fishery", "recreational_catch", "recreational_trips", "recreational_mgmt", "recreational_ports") ~ "Recreational Fishery Characterization", 
             value == "other_econ_info" ~ "Other Socioeconomic Information",
             value %in% c("fmsy_ref_pt", "ssb_ref_pt", "msy_ref_pt", "OFL", "ABC", "harvest_control_rules", "accountability_measures", "signif_catch_present", "signif_catch_information") ~ "Additional Information",
@@ -82,6 +85,7 @@ clean_matrix <- function(data){
                         value == "beg_recruit_yr" ~ "Initial year of time series",
                         value == "retro_pattern" ~ "Retrospective Pattern", 
                         value == "retro_val" ~ "Retrospective Values",
+                        value == "commercial_exvessel" ~ "Commercial Ex-vessel Price per Pound",
                         value == "commercial_mgmt" ~ "Commercial Management Uncertainty Buffer", 
                         value == "rec_acl" ~ "Recreational Fishery Management",
                         value == "rec_fishery" ~ "Recreational Fishery Activity", 
@@ -110,6 +114,48 @@ clean_matrix <- function(data){
 
   return(matrix)
 
+}
+
+### Clean matrix sources ####
+#'
+#' 
+#' 
+get_matrix_sources <- function(data){ 
+  add_sources <- tibble(climate_source = "Hare et al. 2016", 
+                        prey_source = "Prey Habits Shiny App")
+
+  sources <- data |> 
+    drop_na(report_year) |> 
+    select(report_year, stock, ends_with("source")) |> # select only the sources
+    select(!contains("time")) |> # exclude survey metadata columns for the sources question
+    bind_cols(add_sources) |> 
+    pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the sources
+                 names_to = "source_type", # create a new column named factor from the column names
+                 values_to = "source") |> # create a new column named source from the values in the columns
+    # distinct(source, .keep_all = T) |> # remove duplicate sources
+    # arrange(source) |> # put sources in alphabetical order 
+    mutate(factor = case_when(
+      source_type == "assessment_source" ~ "Assessment and Uncertainty", 
+      source_type == "ssb_source" ~ "Biomass", 
+      source_type == "recruitment_source" ~ "Recruitment",
+      source_type == "climate_source" ~"Climate Vulnerability", 
+      source_type %in% c("prey_source", "fish_source") ~ "Fish Condition", 
+      source_type == "commercial_source" ~ "Commercial Fishery Characterization", 
+      source_type == "recreational_source" ~ "Recreational Fishery Characterization", 
+      source_type == "other_econ_source" ~ "Other Socioeconomic Information", 
+      source_type %in% c("ref_pt_source", "spec_source", "signif_catch_source") ~ "Additional Information"
+    ))
+
+  ### Reorder the factors so assessment and uncertainty is first. 
+  #1) create an object containing the factor names in the desired order
+  reorder_levels <- c("Assessment and Uncertainty", "Biomass", "Recruitment", "Climate Vulnerability", "Fish Condition", "Commercial Fishery Characterization", "Recreational Fishery Characterization", "Other Socioeconomic Information", "Additional Information")
+ 
+  #2) use the object to overwrite the default levels of the factor column
+  sources <- sources |> 
+    mutate(factor = factor(factor, levels = reorder_levels)) |> 
+    arrange(factor)
+
+  return(sources)
 }
 
 ### Clean risk policy scores data ####

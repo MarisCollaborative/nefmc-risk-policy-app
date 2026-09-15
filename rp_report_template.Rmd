@@ -7,6 +7,7 @@ params: # NA because they will be replaced by the shiny app parameters
     stock: NA 
     fmp: NA 
     matrix_tbl: NA
+    matrix_ft: NA
     scores: NA
     plot_data: NA
     zscore: NA
@@ -20,47 +21,41 @@ params: # NA because they will be replaced by the shiny app parameters
 knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE) 
 library(gt)
 library(tidyverse)
-# library(flextable)
-library(kableExtra)
+library(flextable)
+# library(kableExtra)
 library(here)
 source(here("helpers.R"))
 ```
 
 
 ```{r matrix-ft}
-# set_flextable_defaults(na_str = "")
+params$matrix_ft
+```
 
+<!-- ```{r matrix-kbl}
 # params$matrix_tbl |> 
-#     mutate(answer = case_when(
-#         is.na(answer) ~ "Not Provided", 
-#         TRUE ~ answer
-#     )) |> 
-#     flextable() |> 
-#     merge_v(j = "factor") |> 
-#     set_header_labels(facor = "Factor", 
-#                       value = "Value", 
-#                       answer = "Supporting Information") |> 
-#     border_inner() |> 
-#     width(width = c(1.5, 2.0, 3.5)) |> 
-#     align(j = 3, align = "justify")
-```
+#     filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
+#     rename_all(str_to_title) |> 
+#     rename(#" " = "factor", 
+#     #     " " = "value",
+#         "Supporting Information" = "Answer") |> 
+#     knitr::kable(booktabs = T) |> #, col.names = NULL) |> 
+#     # add_header_above(c(" " = 1, "Supporting Information" = 2)) |>
+#     kable_styling(latex_options = c("hold_position", "scale_down"), position = "float_left", fixed_thead = T) |>
+#     column_spec(column = 1:2, width = "3cm") |> 
+#     collapse_rows(columns = 1, valign = "top", latex_hline = "full", longtable_clean_cut = F) |> 
+#     # pack_rows("Stock status and Uncertainty", 1, 19, latex_align = "c") |>
+#     column_spec(column = 3, width = "10cm")
 
-```{r matrix-kbl}
-params$matrix_tbl |> 
-    filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
-    rename_all(str_to_title) |> 
-    rename(#" " = "factor", 
-    #     " " = "value",
-        "Supporting Information" = "Answer") |> 
-    knitr::kable(booktabs = T) |> #, col.names = NULL) |> 
-    # add_header_above(c(" " = 1, "Supporting Information" = 2)) |>
-    kable_styling(latex_options = c("hold_position", "scale_down"), position = "float_left", fixed_thead = T) |>
-    column_spec(column = 1:2, width = "3cm") |> 
-    collapse_rows(columns = 1, valign = "top", latex_hline = "full", longtable_clean_cut = F) |> 
-    # pack_rows("Stock status and Uncertainty", 1, 19, latex_align = "c") |>
-    column_spec(column = 3, width = "10cm")
+``` -->
 
-```
+<!-- **Sources**  -->
+
+<!-- ```{r, results='asis'}
+# sources <- params$matrix_sources$source
+
+# cat(sources, sep = "\n\n")
+``` -->
 
 \newpage 
 

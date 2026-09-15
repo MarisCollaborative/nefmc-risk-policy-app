@@ -64,7 +64,8 @@ ui <- fluidPage(
                 ),
               # Page 1 - shows the matrix table based on the sidebar inputs ===========================================================
               nav_panel(title = "Matrix",
-                        gt_output("matrix")
+                        # gt_output("matrix")
+                        uiOutput("matrix")
                         ), 
               # Page 2 - shows the recommended probability information based on user inputs and contains
               nav_panel(title = "Recommended Probability",

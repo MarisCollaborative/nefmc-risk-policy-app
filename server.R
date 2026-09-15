@@ -4,9 +4,11 @@
 ## Environment set-up #### ============================================================
 library(shiny)
 library(tidyverse)
+library(flextable)
+library(officer)
 library(here)
-library(gt)
-library(DT)
+# library(gt)
+# library(DT)
 library(surveydown)
 library(shinyjs)
 
@@ -85,30 +87,134 @@ matrix_tbl  <- reactive({
       select(!c(report_year, stock)) |>  # remove stock and year from table once filtered
       arrange(factor) # arrange the table based on the assigned levels of the 'factor' column
 })
+  
+matrix_sources <- reactive({
 
-# Render a GT table using the reactive info object containing the answers from the matrix survey
-output$matrix <- render_gt({
+  info() |>
+    get_matrix_sources() |> # create a new column named source from the values in the columns
+    filter(report_year == year() & stock == stock())  
+})
+
+### Render a GT table using the reactive info object containing the answers from the matrix survey ####
+# output$matrix <- render_gt({
+  
+#   # does not show the matrix until the inputs are selected
+#    if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+#     return(NULL)
+#   }
+
+#     matrix_tbl() |>
+#       filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
+#       gt(rowname_col = "value", 
+#          groupname_col = "factor", # group rows based on the factor column
+#          row_group_as_column = TRUE) |> 
+#       text_case_match(
+#         NA ~ "Not provided", # where there is an NA replace with "Not provided"
+#         .locations = cells_body(answer) # in the answer column
+#       ) |> 
+#       cols_label(
+#         answer = md("Supporting Information")
+#       ) |>
+#       tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) |> # create a table header using the user inputs
+#       opt_align_table_header(align = "left") 
+  
+# })
+  
+### Render a flextable using the reactive info object containing the answers from the matrix survey #### 
+matrix_ft <- reactive({
+  #### Set up the table ####
+  # customize the border of the table 
+  my_border <- fp_border(color = "black", width = 1)
+  
+  # use the matrix_tbl reactive to create the flextable
+  matrix_ft <- matrix_tbl() |> 
+      rename("Supporting Information" = "answer") |> # rename the answer column to Supporting Information 
+      flextable() |> # create the flextable
+      labelizor( # Title case all the header rows 
+          part = "header", 
+          labels = str_to_title
+      ) |> 
+      width(j = "factor", width = 1.5) |> # modify the Factor column width
+      width(j = "value", width = 2) |> # modify the Value column width
+      width(j = "Supporting Information", width = 3) |> # modify the Supporting Information column width
+      hline(border = my_border, part = "body") # add horizontal lines to each of the cells using the custom border 
+     
+  # merge the factor column based on the value, so one cell for each factor
+  matrix_ft <- merge_v(matrix_ft, j = ~ factor)
+
+  #### Loop over the flextable to add footnotes of all the sources ##### 
+  ##### Set up the parameters for the loop #####
+  # find the row number where the merged cells from above begins to use for an index
+  merge_starts <- which(matrix_ft$body$spans$columns[, 1] >= 1)
+
+  # pull out the matrix_sources table from reactive to static 
+  sources_df <- matrix_sources() 
+
+  # pull out all the unique factors from the sources_df
+  factors <- select(sources_df, factor) |> distinct()
+
+  # combine the column index and the factors 
+  fct_index <- tibble(row_index = merge_starts) |> bind_cols(factors) 
+
+  # join the fct_index table to the sources_df to assign an index to the sources within the table 
+  src_index <- left_join(sources_df, fct_index, by = "factor") 
+
+  # pull out each occurrence of the row index value from the src_index df
+  row_index <- src_index$row_index
+
+  ##### Run the loop based on the number of integers in the row_index vector ####
+  for(i in seq_along(row_index)) { 
+    # for each iteration of the loop, pull out the Source value that occurs at that same index
+    src <- src_index$source[i]
+
+    # if the src object created above is NA, skip the current iteration, and start the next iteration
+    if(is.na(src)) {
+      next
+      }
+    
+    # if the NA condition is FALSE, pull out the row index value from the src_index table based on its position according to the number of the loop iteration 
+    row_condition <- src_index$row_index[i]
+    
+    # overwrite the matrix flextable by adding a footnote
+    matrix_ft <- footnote(matrix_ft, 
+                i = row_condition, # at the specific row based on the row condition value
+                j = "factor", # in the factor column
+                value = # where the note  
+                    as_paragraph(
+                      src # is the source value from above
+                    ), 
+                ref_symbols = as.character(i), # and adds a reference number based on the loop iteration
+                inline = T, # and includes the footnotes on the same line as the previous footnote
+                sep = "; ", # separated by a semicolon
+                symbol_sep = ",") # separated by a comma if more than one reference
+      }
+  # once the loop concludes, save the matrix flextable in the reactive
+  return(matrix_ft)
+
+})
+
+  
+output$matrix <- renderUI({
   
   # does not show the matrix until the inputs are selected
    if (input$year == "Select a year..." || input$stock == "Select a stock...") {
     return(NULL)
   }
 
-    matrix_tbl() |>
-      filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
-      gt(rowname_col = "value", 
-         groupname_col = "factor", # group rows based on the factor column
-         row_group_as_column = TRUE) |> 
-      text_case_match(
-        NA ~ "Not provided", # where there is an NA replace with "Not provided"
-        .locations = cells_body(answer) # in the answer column
-      ) |> 
-      cols_label(
-        answer = md("Supporting Information")
-      ) |>
-      tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) |> # create a table header using the user inputs
-      opt_align_table_header(align = "left") 
-  
+  # formats the size of the table title
+  title_fmt <- fp_text(font.size = 16)
+
+  # creates a table title based on the user inputs for year and stock
+  title <- str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")
+
+  # add the title to the matrix flextable reactive 
+  matrix_ft() |> 
+   set_caption(caption = as_paragraph(
+                      as_chunk(title, props = title_fmt)
+                    ), 
+                  align_with_table = F) |>
+  htmltools_value() # and renders the flextable as an html for shiny viewing
+
 })
 
 
@@ -317,6 +423,7 @@ output$report <- downloadHandler(
                    stock = stock(), 
                   #  fmp = fmp(),
                    matrix_tbl = matrix_tbl(),
+                   matrix_ft = matrix_ft(),
                    scores = final_scores(), 
                    zscore = zscore(), 
                    RecProb = RecProb(), 
