@@ -7,7 +7,7 @@ library(tidyverse)
 library(flextable)
 library(officer)
 library(here)
-# library(gt)
+library(gt)
 # library(DT)
 library(surveydown)
 library(shinyjs)
@@ -161,6 +161,9 @@ matrix_ft <- reactive({
 
   # pull out each occurrence of the row index value from the src_index df
   row_index <- src_index$row_index
+  
+  # initiate a sequence vector in case sources are NA so footnote numbers are not skipped. 
+  seq <- 0
 
   ##### Run the loop based on the number of integers in the row_index vector ####
   for(i in seq_along(row_index)) { 
@@ -171,6 +174,9 @@ matrix_ft <- reactive({
     if(is.na(src)) {
       next
       }
+    
+    # overwrite the sequence object by adding 1 with each iteration
+    seq <- seq + 1
     
     # if the NA condition is FALSE, pull out the row index value from the src_index table based on its position according to the number of the loop iteration 
     row_condition <- src_index$row_index[i]
@@ -183,11 +189,11 @@ matrix_ft <- reactive({
                     as_paragraph(
                       src # is the source value from above
                     ), 
-                ref_symbols = as.character(i), # and adds a reference number based on the loop iteration
+                ref_symbols = as.character(seq), # and adds a reference number based on the sequence object
                 inline = T, # and includes the footnotes on the same line as the previous footnote
                 sep = "; ", # separated by a semicolon
                 symbol_sep = ",") # separated by a comma if more than one reference
-      }
+  }
   # once the loop concludes, save the matrix flextable in the reactive
   return(matrix_ft)
 
