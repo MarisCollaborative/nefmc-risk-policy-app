@@ -121,20 +121,20 @@ clean_matrix <- function(data){
 #' 
 #' 
 get_matrix_sources <- function(data){ 
-  add_sources <- tibble(climate_source = "Hare et al. 2016", 
-                        prey_source = "Prey Habits Shiny App")
+  # add_sources <- tibble(climate_source = "Hare et al. 2016", 
+  #                       prey_source = "Prey Habits Shiny App")
 
   sources <- data |> 
-    drop_na(report_year) |> 
-    select(report_year, stock, ends_with("source")) |> # select only the sources
-    select(!contains("time")) |> # exclude survey metadata columns for the sources question
-    bind_cols(add_sources) |> 
-    pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the sources
+    tidyr::drop_na(report_year) |> 
+    dplyr::select(report_year, stock, tidyselect::ends_with("source")) |> # select only the sources
+    dplyr::select(!tidyselect::contains("time")) |> # exclude survey metadata columns for the sources question
+    # dplyr::bind_cols(add_sources) |> 
+    tidyr::pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the sources
                  names_to = "source_type", # create a new column named factor from the column names
                  values_to = "source") |> # create a new column named source from the values in the columns
     # distinct(source, .keep_all = T) |> # remove duplicate sources
     # arrange(source) |> # put sources in alphabetical order 
-    mutate(factor = case_when(
+    dplyr::mutate(factor = dplyr::case_when(
       source_type == "assessment_source" ~ "Assessment and Uncertainty", 
       source_type == "ssb_source" ~ "Biomass", 
       source_type == "recruitment_source" ~ "Recruitment",
@@ -152,7 +152,7 @@ get_matrix_sources <- function(data){
  
   #2) use the object to overwrite the default levels of the factor column
   sources <- sources |> 
-    mutate(factor = factor(factor, levels = reorder_levels)) |> 
+    dplyr::mutate(factor = factor(factor, levels = reorder_levels)) |> 
     arrange(factor)
 
   return(sources)
@@ -166,12 +166,12 @@ clean_scores <- function(data){
 
   scores <- data |> 
     # select only the columns that did not include the following information
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", ends_with("rationale"), ends_with("source"), "climate_score_level", starts_with("comm_"), starts_with("rec_"))) |>  
+    dplyr::select(!c(tidyselect::starts_with("time"), "session_id", "browser", "ip_address", "current_page", tidyselect::ends_with("rationale"), tidyselect::ends_with("source"), "climate_score_level", tidyselect::starts_with("comm_"), tidyselect::starts_with("rec_"))) |>  
     # make the table longer by taking
     tidyr::pivot_longer(cols = 3:dplyr::last_col(), # all the columns with the scores
                         names_to = "factor", # create a new column named factor from the column names
                         values_to = "score") |> # create a new column named score from the values in the columns
-    tidyr::drop_na(any_of(c("report_year", "stock", "score"))) |>
+    tidyr::drop_na(tidyselect::any_of(c("report_year", "stock", "score"))) |>
     dplyr::mutate(score = as.integer(score)) #, # make the scores an integer
           #  scaled_score = scale_val(score))
   
@@ -187,12 +187,12 @@ clean_weights <- function(data){
 
   weights <- data |> 
     dplyr::relocate(report_year, .before = dplyr::everything()) |> 
-    dplyr::select(!c(starts_with("time"), "session_id", "browser", "ip_address", "current_page", "weight_year", "weightings", "weightings_assessment", "form_id")) |>  
+    dplyr::select(!c(tidyselect::starts_with("time"), "session_id", "browser", "ip_address", "current_page", "weight_year", "weightings", "weightings_assessment", "form_id")) |>  
     tidyr::pivot_longer(cols = 2:dplyr::last_col(),
                         names_to = "factor", 
                         values_to = "weight") |> 
     dplyr::mutate(weight = as.integer(weight), 
-           factor = str_extract(factor, pattern = "(?<=[:punct:])[:alpha:]+")) |> # extract words/letters that are preceded by a punctuation
+           factor = stringr::str_extract(factor, pattern = "(?<=[:punct:])[:alpha:]+")) |> # extract words/letters that are preceded by a punctuation
     tidyr::drop_na(weight) |>
     dplyr::summarise(avg_weight = round(
                                         mean(weight, na.rm = T), 
@@ -221,7 +221,7 @@ plotRecProb <- function(data, z, RecProb, size = 1.5){
   
   ggplot2::ggplot() +
     ggplot2::lims(x = c(-4,4), y = c(0.5,1))+
-    geom_rect(data = horizontal_inf_pts, aes(xmin = x, xmax = x + w, ymin = ymin, ymax = ymax, fill = Tiers), alpha = 0.35) +
+    ggplot2::geom_rect(data = horizontal_inf_pts, aes(xmin = x, xmax = x + w, ymin = ymin, ymax = ymax, fill = Tiers), alpha = 0.35) +
     ggplot2::geom_function(fun = calcRecProb, linewidth = 1, lty = 3) + 
     ggplot2::geom_hline(aes(yintercept = 0.5, color = "MSA 50%\nprobability limit"), linetype = 'dashed', linewidth = 1) +
     ggplot2::geom_point(data = data, aes(x = {{z}}, y = {{RecProb}}, color = "Recommended\nProbability"), size =  size) +
@@ -236,7 +236,7 @@ plotRecProb <- function(data, z, RecProb, size = 1.5){
     ) +
     ggplot2::labs(x = 'Z-Score', y = 'Recommended Probability') +
     ggplot2::theme_bw() +
-    guides(
+    ggplot2::guides(
     color = guide_legend(order = 1, 
       override.aes = list(size = 2.5),
       theme = theme(#legend.justification = "left", 
