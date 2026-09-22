@@ -66,15 +66,17 @@ weights <- sd_get_data(db, table = "rp-weights") |>
 
   
 # a static object containing results from the scoring survey
-scores <- sd_get_data(db, table = "rp_scores") |> 
+score_data <- sd_get_data(db, table = "rp_scores") 
+  
+scores <- score_data |> 
     clean_scores() # uses helper function to tidy the data and columns 
 
 # create a static data frame containing the scores and weights for each factor
 z_data <- left_join(scores, weights, by = c("report_year", "factor")) 
 
 # create a reactive value for later manipulation and restoration
-zdata_rv <- reactiveValues(original = z_data, 
-                           updated = z_data)
+# zdata_rv <- reactiveValues(original = z_data, 
+#                            updated = z_data)
                       
   
 ## Page 1: Matrix Output #### ========================================================
@@ -94,31 +96,6 @@ matrix_sources <- reactive({
     get_matrix_sources() |> # create a new column named source from the values in the columns
     filter(report_year == year() & stock == stock())  
 })
-
-### Render a GT table using the reactive info object containing the answers from the matrix survey ####
-# output$matrix <- render_gt({
-  
-#   # does not show the matrix until the inputs are selected
-#    if (input$year == "Select a year..." || input$stock == "Select a stock...") {
-#     return(NULL)
-#   }
-
-#     matrix_tbl() |>
-#       filter(value!="Sources") |> # remove the row that contains the list of sources used to collate information for the matrix
-#       gt(rowname_col = "value", 
-#          groupname_col = "factor", # group rows based on the factor column
-#          row_group_as_column = TRUE) |> 
-#       text_case_match(
-#         NA ~ "Not provided", # where there is an NA replace with "Not provided"
-#         .locations = cells_body(answer) # in the answer column
-#       ) |> 
-#       cols_label(
-#         answer = md("Supporting Information")
-#       ) |>
-#       tab_header(title = str_c(year(), "Risk Policy Matrix for", stock(), sep = " ")) |> # create a table header using the user inputs
-#       opt_align_table_header(align = "left") 
-  
-# })
   
 ### Render a flextable using the reactive info object containing the answers from the matrix survey #### 
 matrix_ft <- reactive({
@@ -279,17 +256,18 @@ output$matrix <- renderUI({
 
   
 ### Final Reactives #### ================================================================
-original_zvals <- reactive({
-  zdata_rv$original |> 
-    filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
-    mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
-    summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
-              RecProb= calcRecProb(zscore))  # calculate the recommended probability using the logistic function
-})
+# original_zvals <- reactive({
+#   zdata_rv$original |> 
+#     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
+#     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
+#     summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
+#               RecProb= calcRecProb(zscore))  # calculate the recommended probability using the logistic function
+# })
 
 # Using the "Updated Reactive Value" (regardless of it's state), create a reactive object
 zscore_vals <- reactive({
-  zdata_rv$updated |> 
+  # zdata_rv$updated |> 
+  z_data |>
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock, and
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
     summarise(zscore = calc_zscore(score, normalized_weight), # calculate the zscore using a helper function, and
@@ -299,7 +277,8 @@ zscore_vals <- reactive({
 
 # Using the "Updated Reactive Value" (regardless of it's state), create a data reactive that can be used in the shiny output and report
 final_scores <- reactive({ 
-  zdata_rv$updated |> 
+  # zdata_rv$updated |> 
+  z_data |>
     filter(report_year == year(), stock == stock()) |> # filtered by user inputs for year and stock
     mutate(normalized_weight = round(normalize_val(avg_weight), 2)) |>
     select(!c(normalized_weight)) |> 
@@ -355,7 +334,7 @@ RecProb_plot <- reactive({
               size = 3)
 })
 
-## Outputs ####
+### Outputs ####
   
 # Render the GT table output using the data reactive
 output$scores <- render_gt({
@@ -400,7 +379,36 @@ output$ClassifyZone <- renderText(
   TierArea()
 )
 
+## Page 3: AP Input #### ===========================================================
+score_info <- reactive({
+  score_data |> 
+  filter(report_year == year(), stock == stock()) |> 
+  select("comm_ap_rationale", "rec_ap_rationale")
   
+})
+  
+output$com_ap <- renderText({
+  if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+    return(NULL)
+  }
+
+    score_info()$comm_ap_rationale
+
+})
+
+output$rec_ap <- renderText({
+  if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+    return(NULL)
+  }
+
+  if(is.na(score_info()$rec_ap_rationale)){
+    paste0("There is no recreational sub-ACL for this stock. Thus the recreational fishery was not characterized or scored and the recreational AP did not advise on this factor.")
+  } else {
+    score_info()$rec_ap_rationale
+  }
+
+})
+
 ## Report #### =====================================================================
 # create a temporary file location
 report_path <- tempfile(fileext = ".qmd")
