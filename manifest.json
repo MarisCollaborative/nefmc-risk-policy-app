@@ -5197,7 +5197,7 @@
       "checksum": "eae835a316eb46eec45a56839a1be351"
     },
     ".Rprofile": {
-      "checksum": "2739848945418d955eb5227b7a507714"
+      "checksum": "e4e7d75cce153d9e6cfa394718acec1a"
     },
     "app.R": {
       "checksum": "001b6a6191733cb394d04f23f427edcb"
@@ -5205,113 +5205,20 @@
     "helpers.R": {
       "checksum": "6d453520a101aa4fa4f367108a762083"
     },
-    "NEFMC_PPT_MASTER_2026.potx": {
-      "checksum": "20708a904908501fce925ba0c60016fb"
-    },
-    "normalized_wt_differences.csv": {
-      "checksum": "5512482afc6fab7de1c7bc1b78a6637d"
-    },
     "README.md": {
       "checksum": "73f1c6b3bb448ed30c1d8d06b6fc8226"
     },
     "renv.lock": {
       "checksum": "89a99c1fb28729b54b2ef4dac74d0603"
     },
-    "rp_ppt_template.Rmd": {
-      "checksum": "ba8f6cc6800329313bbd92f1a6ebe037"
-    },
     "rp_report_template.Rmd": {
       "checksum": "e3725fae65e056f86c2e7ac3dc3dbd16"
     },
-    "rp_report_template_static.pdf": {
-      "checksum": "5e6d5371294451c953c946fe07e5750d"
-    },
-    "rp_report_template_static.qmd": {
-      "checksum": "10e2bde2399d1c921076a11f556e5d22"
-    },
     "server.R": {
-      "checksum": "03d5dbd3484e55d172a8074f415b5ded"
-    },
-    "shiny_quarto_data/data_chunks_index.txt": {
-      "checksum": "e9a7b18a42db655a265232f05ac57d0e"
-    },
-    "shiny_quarto_data/unnamed-chunk-2.RData": {
-      "checksum": "b817776ddaee0aa8029b4c80c5400af7"
-    },
-    "shiny_quarto_files/libs/bootstrap/bootstrap-890b18279d630a8af0357820e6fbb7bc.min.css": {
-      "checksum": "890b18279d630a8af0357820e6fbb7bc"
-    },
-    "shiny_quarto_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css": {
-      "checksum": "9e3ffae467580fdb927a41352e75a2e0"
-    },
-    "shiny_quarto_files/libs/bootstrap/bootstrap-dark-890b18279d630a8af0357820e6fbb7bc.min.css": {
-      "checksum": "890b18279d630a8af0357820e6fbb7bc"
-    },
-    "shiny_quarto_files/libs/bootstrap/bootstrap-icons.css": {
-      "checksum": "886da841d7421705f715f600c5ff11bb"
-    },
-    "shiny_quarto_files/libs/bootstrap/bootstrap-icons.woff": {
-      "checksum": "efe54401ef52214fd3b701e23ff88c5f"
-    },
-    "shiny_quarto_files/libs/bootstrap/bootstrap.min.js": {
-      "checksum": "e2b09c06f0e714b6144a6788a28e3950"
-    },
-    "shiny_quarto_files/libs/clipboard/clipboard.min.js": {
-      "checksum": "15f52a1ee547f2bdd46e56747332ca2d"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/components.js": {
-      "checksum": "ac49ebff39666f27f4631a3914841683"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/datatables.min.css": {
-      "checksum": "7b2279175549cd49b758a7d5b4da6cd6"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/datatables.min.js": {
-      "checksum": "c06be800b0cfc85e5d5b522e200c5f51"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/pdfmake.min.js": {
-      "checksum": "95caca411bcbd3095c0f8db152de05dd"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/quarto-dashboard.js": {
-      "checksum": "73bfea128e6f7c27f0bab4cc0777aff9"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/stickythead.js": {
-      "checksum": "5b27aeec9a60192899f23015fd741564"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/vfs_fonts.js": {
-      "checksum": "8a026906153f3e29bc684f6b392e8654"
-    },
-    "shiny_quarto_files/libs/quarto-dashboard/web-components.js": {
-      "checksum": "c91de9b5866fb45c694bbeafa119d6b9"
-    },
-    "shiny_quarto_files/libs/quarto-html/anchor.min.js": {
-      "checksum": "91bcf6cd1fd88fec3f109811e5fc3546"
-    },
-    "shiny_quarto_files/libs/quarto-html/axe/axe-check.js": {
-      "checksum": "b4f6a44157bfe20b68b69aabf2f8125d"
-    },
-    "shiny_quarto_files/libs/quarto-html/popper.min.js": {
-      "checksum": "3a4a291ccf3f1ea0f82b641542fd3827"
-    },
-    "shiny_quarto_files/libs/quarto-html/quarto-syntax-highlighting-dark-b651517ce65839d647a86e2780455cfb.css": {
-      "checksum": "b651517ce65839d647a86e2780455cfb"
-    },
-    "shiny_quarto_files/libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css": {
-      "checksum": "dc55a5b9e770e841cd82e46aadbfb9b0"
-    },
-    "shiny_quarto_files/libs/quarto-html/quarto.js": {
-      "checksum": "a65a7780c10232b6515cdfb8beaaa221"
-    },
-    "shiny_quarto_files/libs/quarto-html/tabsets/tabsets.js": {
-      "checksum": "e8d6a8862b33ccc461f8fd532e05b365"
-    },
-    "shiny_quarto_files/libs/quarto-html/tippy.css": {
-      "checksum": "ebd6f8ce46a677e1a4f5f8a8317109a9"
-    },
-    "shiny_quarto_files/libs/quarto-html/tippy.umd.min.js": {
-      "checksum": "d828775275749701b48bd9d958814111"
+      "checksum": "95bae8dadeeb1b7e248603f64d34e34d"
     },
     "ui.R": {
-      "checksum": "013ef40ce4df66189b2bfbea174b800d"
+      "checksum": "c8ee87695352759c18b3762f5d86c7cb"
     }
   },
   "users": null

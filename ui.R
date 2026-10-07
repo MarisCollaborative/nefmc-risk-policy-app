@@ -30,7 +30,7 @@ fmp_vals <- unique(nefishr::nefmc_species$FMP) |> sort()
 ui <- fluidPage(
   shinyjs::useShinyjs(),
   # create a multi-page application 
-  page_navbar(title = 'NEFMC Risk Policy Application', # with the following title
+  page_navbar(title = 'NEFMC Risk Policy Toolkit', # with the following title
               # Side bar - shared across pages, that has the following ===============================================================
               sidebar = sidebar( 
                 # Settings  
@@ -100,13 +100,13 @@ ui <- fluidPage(
                                 ), 
 
                         ### Tab 3: information from scoring regarding AP Input for Fishery Factors =======
-                        nav_panel("AP Input on Fishery Characterizations",
-                                  h5(em("Commercial Advisory Panel")),
-                                  textOutput("com_ap"),
-                                  h5(em("Recreational Advisory Panel")),
-                                  textOutput("rec_ap")
-                                )
-                                      ),
+                        # nav_panel("AP Input on Fishery Characterizations",
+                        #           h5(em("Commercial Advisory Panel")),
+                        #           textOutput("com_ap"),
+                        #           h5(em("Recreational Advisory Panel")),
+                        #           textOutput("rec_ap")
+                        #         )
+                                      )#,
                       ),
              
             ## Page 3 - About the application and how to use it ========================================================================
@@ -121,7 +121,7 @@ ui <- fluidPage(
                 tags$li(strong("A top navigation bar:"), " to navigate throughout the application"), 
                 tags$li(strong("A user selection menu:"), " a collapsible menu on the left-hand side to filter the data within the application based on a specific Council action year, Fishery Management Plan, and stock. Hide the menu using the carrot in the top right corner of the menu."), 
                 tags$li(strong("The Matrix page:"), " displays additional qualitative information and context for the selected stock that was considered during the decision-making process for each of the Risk Policy factors."),
-                tags$li(strong("The Recommended Probability page:"), " displays the quantitative outputs of the Risk Policy mechanics. It includes a table of the risk policy factors scored and scaled by the FMP Plan Development Teams, the average weights for each factor approved by the Council; statements about the calculated values of the Z-score and recommended probability; the final Z-score plotted along the recommended probability curve; and additional information regarding the advisory panel's input on the fishery characterizations."), 
+                tags$li(strong("The Recommended Probability page:"), " displays the quantitative outputs of the Risk Policy mechanics. It includes a table of the risk policy factors scored and scaled by the FMP Plan Development Teams, the average weights for each factor approved by the Council; statements about the calculated values of the Z-score and recommended probability; the final Z-score plotted along the recommended probability curve."), #; and additional information regarding the advisory panel's input on the fishery characterizations."), 
                 tags$li(strong("A Generate Report button:"), " nested within the user selection menu. Clicking this button will generate and download a report onto your device containing information from the Matrix and Recommended Probability page based on the user's selections in the menu."))
           )
           )

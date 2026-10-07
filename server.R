@@ -380,34 +380,34 @@ output$ClassifyZone <- renderText(
 )
 
 ## Page 3: AP Input #### ===========================================================
-score_info <- reactive({
-  score_data |> 
-  filter(report_year == year(), stock == stock()) |> 
-  select("comm_ap_rationale", "rec_ap_rationale")
+# score_info <- reactive({
+#   score_data |> 
+#   filter(report_year == year(), stock == stock()) |> 
+#   select("comm_ap_rationale", "rec_ap_rationale")
   
-})
+# })
   
-output$com_ap <- renderText({
-  if (input$year == "Select a year..." || input$stock == "Select a stock...") {
-    return(NULL)
-  }
+# output$com_ap <- renderText({
+#   if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+#     return(NULL)
+#   }
 
-    score_info()$comm_ap_rationale
+#     score_info()$comm_ap_rationale
 
-})
+# })
 
-output$rec_ap <- renderText({
-  if (input$year == "Select a year..." || input$stock == "Select a stock...") {
-    return(NULL)
-  }
+# output$rec_ap <- renderText({
+#   if (input$year == "Select a year..." || input$stock == "Select a stock...") {
+#     return(NULL)
+#   }
 
-  if(is.na(score_info()$rec_ap_rationale)){
-    paste0("There is no recreational sub-ACL for this stock. Thus the recreational fishery was not characterized or scored and the recreational AP did not advise on this factor.")
-  } else {
-    score_info()$rec_ap_rationale
-  }
+#   if(is.na(score_info()$rec_ap_rationale)){
+#     paste0("There is no recreational sub-ACL for this stock. Thus the recreational fishery was not characterized or scored and the recreational AP did not advise on this factor.")
+#   } else {
+#     score_info()$rec_ap_rationale
+#   }
 
-})
+# })
 
 ## Report #### =====================================================================
 # create a temporary file location
